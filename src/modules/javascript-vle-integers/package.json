@@ -1,0 +1,20 @@
+{
+  "name": "vle-integers",
+  "version": "0.1.1",
+  "description": "Variable Length Encoded Integers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d9d/javascript-vle-integers.git"
+  },
+  "keywords": ["numbers", "integers", "variable", "length", "encoding", "vle"],
+  "author": "Mark Kahn <m@vouchr.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/d9d/javascript-vle-integers/issues"
+  },
+  "homepage": "https://github.com/d9d/javascript-vle-integers#readme"
+}
