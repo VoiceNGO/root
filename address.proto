@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+import "enums/country.proto";
+import "person.proto";
+
+message Address {
+  optional int32   id      = 1;
+  optional string  line1   = 2;
+  optional string  line2   = 3;
+  optional string  city    = 4;
+  optional string  state   = 5;
+  optional string  zip     = 6;
+  optional Country country = 7;
+
+  extend Person {
+    repeated Address addresses = 104;
+  }
+}

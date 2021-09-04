@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+import "timestamp.proto";
+import "duration.proto";
+import "any.proto";
+import "enums/file-type.proto";
+import "server.proto";
+
+message File {
+  optional int32     id       = 1;
+  optional string    name     = 2;
+  optional FileType  fileType = 3;
+  optional Timestamp created  = 4;
+  optional Timestamp expires  = 5;
+  optional bool      public   = 6;
+  optional Server    server   = 7;
+  optional string    md5hash  = 8;
+
+  extensions 100 to max;
+  /* Utilized 101 */
+}

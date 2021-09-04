@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message Duration {
+  uint32 seconds = 1;
+  uint32 nanos   = 2;
+}

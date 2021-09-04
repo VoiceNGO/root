@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message Timestamp {
+  // uint32 caps this at 2106-02-07, whatever ;)
+  uint32 seconds = 1;
+  uint32 nanos   = 2;
+}

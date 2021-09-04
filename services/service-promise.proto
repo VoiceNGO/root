@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+import "any.proto";
+import "empty.proto";
+
+package Services;
+
+service PromiseRPC {
+  rpc createPromise  (Empty)           returns (PromiseResolver);
+  rpc resolvePromise (PromiseResolver) returns (Promise);
+  rpc rejectPromise  (PromiseResolver) returns (Promise);
+  rpc updatePromise  (Promise)         returns (Promise);
+}
+
+message PromiseResolver {
+  Promise promise = 1;
+  string  key     = 2;
+}
+
+message Promise {
+  int32         id      = 1;
+  PromiseStatus state   = 2;
+  Any           payload = 3;
+
+  enum PromiseStatus {
+    PENDING  = 0;
+    RESOLVED = 1;
+    REJECTED = 2;
+  }
+}

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package Services;
+
+service VideoEncoder {
+  rpc encode (EncodeRequest) returns (EncodeResponse);
+}
+
+message EncodeRequest {
+
+}
+
+message EncodeResponse {
+
+}
