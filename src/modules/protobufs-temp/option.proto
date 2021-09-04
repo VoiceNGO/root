@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-import "any.proto";
-
-message Option {
-  string name  = 1;
-  Any    value = 2;
-}

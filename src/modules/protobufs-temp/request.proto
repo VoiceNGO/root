@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-import "any.proto";
-import "token.proto";
-
-message Request {
-  Token token = 1;
-  Any   data  = 2;
-}

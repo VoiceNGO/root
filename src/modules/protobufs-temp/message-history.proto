@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-import "any.proto";
-import "timestamp.proto";
-
-message MessageHistory {
-  Any       message = 1;
-  Timestamp created = 2;
-}
