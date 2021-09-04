@@ -28,13 +28,13 @@
     "**/*.json": [
       "prettier --write"
     ],
-    "**/*.(ts|tsx)?": [
+    "**/*!(.d).(ts|tsx)?": [
       "prettier --write",
       "eslint",
       "jest --findRelatedTests"
     ],
-    "**/*.(js|jsx)": [
-      ">&2 echo \"May not commit .js or .jsx files.  Use Typescript\" && return 1"
+    "**/!(build)/*.(js|jsx)": [
+      "src/scripts/lint-staged-js.sh"
     ]
   },
   "devDependencies": {

@@ -1,19 +1,23 @@
 {
   "name": "promise-repeat",
   "version": "0.4.1",
-  "description":
-    "A simple dependency-free promise library that retries a given function until it succeeds or certain fail criteria are met.  Can also be used to timeout Promises.",
+  "description": "A simple dependency-free promise library that retries a given function until it succeeds or certain fail criteria are met.  Can also be used to timeout Promises.",
   "main": "index.js",
   "author": "Mark Kahn <m-npm@vouchr.com>",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/d9d/promise-repeat"
-  },
+  "repository": "https://github.com/voicengo/promise-repeat",
   "license": "MIT",
-  "keywords": ["promise", "promises", "repeat", "retry", "timeout", "bluebird", "A+"],
-  "files": ["index.js", "License", "Readme.md"],
+  "keywords": [
+    "promise",
+    "promises",
+    "repeat",
+    "retry",
+    "timeout",
+    "bluebird",
+    "A+"
+  ],
   "devDependencies": {
-    "bluebird": ">=2.9.34",
-    "chai": ">=3.2.0"
+    "jest": "^27.1.0",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.2"
   }
 }
