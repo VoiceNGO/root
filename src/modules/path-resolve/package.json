@@ -1,9 +1,10 @@
 {
   "name": "path-resolve",
-  "version": "0.0.2",
+  "version": "1.0.1",
   "description": "Expands any path into an absolute path",
   "main": "build/index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
