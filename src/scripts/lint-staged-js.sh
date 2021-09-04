@@ -1,0 +1,1 @@
+echo "May not commit .js or .jsx files.  Use Typescript" >&2; exit 1
