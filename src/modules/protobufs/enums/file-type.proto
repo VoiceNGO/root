@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+enum FileType {
+  OTHER = 0;
+  PNG   = 1;
+  PNG8  = 2;
+  PNG8t = 3;
+  PNG32 = 4;
+  JPG   = 5;
+  GIF   = 6;
+  WEBP  = 7;
+  HTML  = 8;
+  JS    = 9;
+  STYL  = 10;
+  CSS   = 11;
+  JADE  = 12;
+  MD    = 13;
+  MP4   = 14;
+  SVG   = 15;
+}

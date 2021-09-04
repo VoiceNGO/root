@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+enum ResponseType {
+  file   = 0;
+  string = 1;
+  base64 = 2;
+  bytes  = 3;
+}

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "i18n.proto";
+
+message Status {
+  int32 code    = 1;
+  i18n  message = 2;
+  bool  isError = 3;
+}

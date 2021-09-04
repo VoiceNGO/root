@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message ProtoURL {
+  string url = 1;
+}

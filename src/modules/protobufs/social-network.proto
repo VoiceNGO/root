@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+import "person.proto";
+
+message SocialNetwork {
+  optional NetworkName network = 1;
+
+  enum NetworkName {
+    FACEBOOK   = 0;
+    TWITTER    = 1;
+    PINTEREST  = 2;
+    TUMBLR     = 3;
+    LINKEDIN   = 4;
+    GOOGLEPLUS = 5;
+    INSTAGRAM  = 6;
+  }
+
+  extend Person {
+    repeated SocialNetwork socialNetworks = 101;
+  }
+}

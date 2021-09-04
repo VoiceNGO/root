@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+import "user.proto";
+import "image.proto";
+
+package Challenge;
+
+message ChallengeUserDetails {
+  optional Image profileImage = 1;
+
+  extend User {
+    optional ChallengeUserDetails challenge = 100;
+  }
+}

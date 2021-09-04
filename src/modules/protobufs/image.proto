@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+import "file.proto";
+
+message Image {
+  repeated File files = 15;
+}
+
+message Dimensions {
+  optional int32 width  = 1;
+  optional int32 height = 2;
+
+  extend File {
+    optional Dimensions dimensions = 100;
+  }
+}
