@@ -1,0 +1,11 @@
+{
+  "name": "gif-encoder",
+  "version": "0.0.1",
+  "description": "GIF Encoder",
+  "main": "build/index.js",
+  "author": "Mark Kahn <m-github@vouchr.com>",
+  "license": "MIT",
+  "dependencies": {
+    "canvas": "^1.6.11"
+  }
+}

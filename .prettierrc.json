@@ -1,0 +1,11 @@
+{
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "proseWrap": "preserve",
+  "overrides": [
+    {
+      "files": "*.ts",
+      "options": { "parser": "typescript" }
+    }
+  ]
+}

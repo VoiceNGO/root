@@ -1,0 +1,52 @@
+import path from 'path';
+import { readdirSync } from 'fs';
+
+const {
+  startsWithUpperCase,
+  toPascalCase,
+  toCamelCase,
+} = require('../dist/string');
+const { isClass } = require('../dist/fn');
+
+function getModuleInfo(filePath: absolutePath) {
+  let module = require(filePath.replace('/src/', '/dist/'));
+  let isDefault = false;
+  let moduleName = '';
+  const fileName = path.basename(filePath, '.js');
+  // if this is an ES6 module just look at the default export if it exists
+  if (module.__esModule && module.default) {
+    module = module.default;
+    isDefault = true;
+  }
+
+  if (
+    module instanceof Function &&
+    startsWithUpperCase(module.name) &&
+    isClass(module)
+  ) {
+    moduleName = toPascalCase(fileName);
+  } else {
+    moduleName = toCamelCase(fileName);
+  }
+
+  return { moduleName, isDefault };
+}
+
+export default function (dirname: string) {
+  const files = readdirSync(dirname);
+
+  return files
+    .filter((file) =>
+      /^(?!\.)(?!(index|codegen).[jt]sx?$).*\.[jt]sx?$/.test(file)
+    )
+    .map((file) => {
+      const fileName = file.replace(/.ts$/, '.js');
+      const filePath = path.join(dirname, fileName);
+      const { moduleName, isDefault } = getModuleInfo(filePath);
+      const exportStatement = isDefault
+        ? `{ default as ${moduleName} }`
+        : `* as ${moduleName}`;
+      return `export ${exportStatement} from './${fileName}'`;
+    })
+    .join('\n');
+}

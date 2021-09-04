@@ -1,0 +1,65 @@
+{
+  "name": "voice-npo",
+  "version": "0.0.1",
+  "description": "Voice NPO root repository",
+  "author": "Mark Kahn <m@voice.ngo>",
+  "license": "MIT",
+  "private": true,
+  "repository": "https://github.com/VoiceNGO/root.git",
+  "homepage": "https://github.com/VoiceNGO/root.git",
+  "sideEffects": [
+    "*.se.ts"
+  ],
+  "workspaces": [
+    "src/apps/*",
+    "src/misc/*",
+    "src/modules/*",
+    "src/tools/*"
+  ],
+  "scripts": {
+    "build": "webpack",
+    "outdated": "npm-check --ignore=\"{typescript,ts-node,prettier,voice-types,node-utils}\"",
+    "postinstall": "husky install",
+    "test": "jest",
+    "ts-node": "ts-node -r tsconfig-paths/register"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.15.0",
+    "@babel/preset-typescript": "^7.15.0",
+    "@tsconfig/node16": "^1.0.2",
+    "@tsconfig/recommended": "^1.0.1",
+    "@types/globby": "^9.1.0",
+    "@types/jest": "^27.0.1",
+    "@types/koa": "^2.13.4",
+    "@types/node": "^16.4.13",
+    "@typescript-eslint/eslint-plugin": "^4.29.1",
+    "@typescript-eslint/parser": "^4.29.1",
+    "ast-utils": "^1.0.0",
+    "babel-jest": "^27.0.6",
+    "esbuild": "^0.12.23",
+    "esbuild-jest": "^0.5.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jest": "^24.4.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-voice": "link:./src/misc/eslint-plugin-voice",
+    "expect": "^27.0.6",
+    "husky": "^7.0.1",
+    "jest": "^27.0.0",
+    "prettier": "^2.3.2",
+    "ts-jest": "^27.0.5",
+    "ts-node": "^10.2.0",
+    "tsd": "^0.17.0",
+    "typescript": "^4.4.0-beta"
+  },
+  "dependencies": {
+    "apollo-server-koa": "^3.1.2",
+    "commander": "^8.1.0",
+    "globby": "^12.0.0",
+    "graphql": "^15.5.1",
+    "koa": "^2.13.1",
+    "tsconfig-paths": "^3.10.1",
+    "tslib": "^2.3.0",
+    "winston": "^3.3.3"
+  }
+}

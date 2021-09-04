@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message int32Range {
+  int32 from = 1;
+  int32 to   = 2;
+}
+
+message floatRange {
+  float from = 1;
+  float to   = 2;
+}

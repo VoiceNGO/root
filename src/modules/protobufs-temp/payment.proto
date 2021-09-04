@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "timestamp.proto";
+import "credit-card.proto";
+import "message-date.proto";
+import "user.proto";
+
+message Payment {
+  int32         id           = 1;
+  MessageDate   date         = 2;
+  User          user         = 3;
+  CreditCard    card         = 4;
+  float         amount       = 5;
+  Timestamp     processAfter = 6;
+  PaymentStatus status       = 7;
+}
+
+enum PaymentStatus {
+  UNPROCESSED = 0;
+  PENDING     = 1;
+  SUCCESS     = 2;
+  FAIL        = 3;
+}

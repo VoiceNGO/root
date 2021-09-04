@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message Vote {
+  int32 rating   = 1;
+  bool  upvote   = 2;
+  bool  downvote = 3;
+}

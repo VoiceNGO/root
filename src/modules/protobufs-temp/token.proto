@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+message Token {
+
+}
+
+message Permission {
+  string service = 1;
+  string data    = 2;
+
+  // Permissions
+  bool   read    = 14;
+  bool   write   = 15;
+}
+
+message tokenRequest {
+  string token = 1;
+
+
+}

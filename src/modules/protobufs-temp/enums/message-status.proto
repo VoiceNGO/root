@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+enum MessageStatus {
+  MSG_NORMAL   = 0;
+  MSG_PENDING  = 1;
+  MSG_DISABLED = 14;
+  MSG_DELETED  = 15;
+}

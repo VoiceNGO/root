@@ -1,0 +1,13 @@
+{
+  "My Snippet": {
+    "scope": "typescript",
+    "prefix": "testFileContents",
+    "body": [
+      "import expect from 'expect';",
+      "import ${TM_FILENAME_BASE/(.*).test/${1:/camelcase}/g} from '../${TM_FILENAME_BASE/(.*).test/$1/g}';",
+      "",
+      "$0"
+    ],
+    "description": "Default test file"
+  }
+}

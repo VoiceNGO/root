@@ -1,0 +1,19 @@
+{
+  "search.exclude": {
+    "**/dist/*": true,
+    "**/build/*": true
+  },
+  "files.exclude": {
+    "**/*.codegen.*": true,
+    ".*": true,
+    "package.json": true,
+    "*.config.*": true,
+    "tsconfig.*": true,
+    "yarn.lock": true,
+    "config/**/*": false,
+    ".yarn/*": true
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "eslint.packageManager": "yarn",
+  "eslint.validate": ["javascript", "typescript"]
+}

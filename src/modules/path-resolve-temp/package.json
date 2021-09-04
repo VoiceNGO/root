@@ -1,0 +1,35 @@
+{
+  "name": "path-resolve",
+  "version": "1.0.1",
+  "description": "Expands any path into an absolute path",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VoiceNGO/path-resolve.git"
+  },
+  "keywords": [
+    "path",
+    "resolve",
+    "absolute",
+    "tilde",
+    "home"
+  ],
+  "author": "Mark Kahn <m@vouchr.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VoiceNGO/path-resolve/issues"
+  },
+  "homepage": "https://github.com/VoiceNGO/path-resolve#readme",
+  "dependencies": {
+    "expand-tilde": "^2.0.2"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.2",
+    "@tsconfig/recommended": "^1.0.1",
+    "typescript": "^4.4.2"
+  }
+}

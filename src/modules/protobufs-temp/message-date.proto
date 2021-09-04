@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+import "timestamp.proto";
+
+message MessageDate {
+  Timestamp created  = 1;
+  Timestamp modified = 2;
+}

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "eES", "DOM"
+    ],
+    "module": "commonjs",
+    "target": "ES6"
+  }
+}

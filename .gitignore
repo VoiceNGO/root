@@ -1,0 +1,22 @@
+# Log files
+yarn-debug.log*
+yarn-error.log*
+
+# OSX nonsense
+**/.DS_Store
+**/Thumbs.db
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# node
+node_modules
+
+# typescript
+**/tsconfig.tsbuildinfo
