@@ -6,15 +6,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/d9d/javascript-vle-integers.git"
-  },
-  "keywords": ["numbers", "integers", "variable", "length", "encoding", "vle"],
+  "repository": "git+ssh://git@github.com:VoiceNGO/javascript-vle-integers.git",
+  "keywords": [
+    "numbers",
+    "integers",
+    "variable",
+    "length",
+    "encoding",
+    "vle"
+  ],
   "author": "Mark Kahn <m@vouchr.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/d9d/javascript-vle-integers/issues"
+    "url": "https://github.com/VoiceNGO/javascript-vle-integers/issues"
   },
-  "homepage": "https://github.com/d9d/javascript-vle-integers#readme"
+  "homepage": "https://github.com/VoiceNGO/javascript-vle-integers#readme"
 }
