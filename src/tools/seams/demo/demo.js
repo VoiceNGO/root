@@ -1,6 +1,6 @@
 // @flow
 
-const Renderer = require('../lib/renderer');
+const Renderer = require('../build/renderer');
 
 class Carver {
   constructor(imageName: string) {
