@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const defaultOptions = {
     maxAttempts: 3,
     timeoutMs: 3000,
@@ -38,30 +40,17 @@ class ErrorWithPreviousErrors extends Error {
         }
     }
 }
-export default function retryPromise(fn, options = {}) {
+function retryPromise(fn, options = {}) {
     const config = { ...defaultOptions, ...options };
     const { maxAttempts, timeoutMs, throttleMs, throttleFn, shouldRetryFn, resolveAfterReject, } = config;
     return (...args) => {
         return new Promise((resolve, reject) => {
-            const startTime = Date.now();
             const rejections = [];
             let retryCount = 0;
             let rejected = false;
-            function successHandler(result) {
-                if (rejected) {
-                    resolveAfterReject(result);
-                }
-                else {
-                    resolve(result);
-                }
-            }
             async function errHandler(err) {
-                const now = Date.now();
                 const retryCountExceeded = retryCount >= maxAttempts - 1;
-                const timeoutExceeded = now >= startTime + timeoutMs;
-                const shouldRetry = !retryCountExceeded &&
-                    !timeoutExceeded &&
-                    shouldRetryFn(err, retryCount);
+                const shouldRetry = !retryCountExceeded && shouldRetryFn(err, retryCount);
                 if (shouldRetry) {
                     retryCount++;
                     rejections.push(err);
@@ -75,14 +64,19 @@ export default function retryPromise(fn, options = {}) {
                     reject(rejectionErr);
                 }
             }
-            function executeFn() {
-                return Promise.resolve()
-                    .then(() => fn(...args))
-                    .then(successHandler)
-                    .catch(errHandler);
-            }
             function run() {
-                return Promise.race([executeFn(), deferReject()]);
+                const fnPromise = Promise.resolve().then(() => fn(...args));
+                fnPromise
+                    .then((result) => {
+                    if (rejected) {
+                        resolveAfterReject(result);
+                    }
+                })
+                    // eslint-disable-next-line @typescript-eslint/no-empty-function -- don't care about any error here, it's caught below.  We just care that it doesn't end up uncaught
+                    .catch(() => { });
+                return Promise.race([fnPromise, deferReject()])
+                    .then(resolve)
+                    .catch(errHandler);
             }
             // reject if fn (or subsequent call) is taking too long
             async function deferReject() {
@@ -93,3 +87,4 @@ export default function retryPromise(fn, options = {}) {
         });
     };
 }
+exports.default = retryPromise;
