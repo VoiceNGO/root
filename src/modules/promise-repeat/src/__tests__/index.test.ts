@@ -43,6 +43,12 @@ function genNRejectsThenResolve(
   };
 }
 
+async function timeAsyncFn(fn: Function) {
+  const start = Date.now();
+  await fn();
+  return Date.now() - start;
+}
+
 beforeEach(() => {
   resolveMock = jest.fn();
   rejectMock = jest.fn();
@@ -124,4 +130,44 @@ test('resolve after reject is called for each failure', async () => {
 
   expect(afterRejectMockFn).toHaveBeenCalledWith(RESOLVE);
   expect(afterRejectMockFn).toHaveBeenCalledTimes(3);
+});
+
+test('throttling', async () => {
+  const afterRejectMockFn = jest.fn();
+  const repeater = promiseRepeat(() => genResolveAfterMs(0), {
+    timeoutMs: 0,
+    maxAttempts: 3,
+    throttleMs: 100,
+  });
+
+  const elapsedTime = await timeAsyncFn(async () => {
+    try {
+      await repeater();
+    } catch {}
+  });
+
+  expect(elapsedTime).toBeGreaterThanOrEqual(200);
+});
+
+test('dynamic throttling', async () => {
+  let throttleTime = 50;
+  function throttler() {
+    throttleTime *= 2;
+    return throttleTime;
+  }
+
+  const afterRejectMockFn = jest.fn();
+  const repeater = promiseRepeat(() => genResolveAfterMs(0), {
+    timeoutMs: 0,
+    maxAttempts: 3,
+    throttleFn: throttler,
+  });
+
+  const elapsedTime = await timeAsyncFn(async () => {
+    try {
+      await repeater();
+    } catch {}
+  });
+
+  expect(elapsedTime).toBeGreaterThanOrEqual(300);
 });
