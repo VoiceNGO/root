@@ -1,8 +1,8 @@
 {
   "name": "path-resolve",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Expands any path into an absolute path",
-  "main": "build/index.js",
+  "main": "build",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
