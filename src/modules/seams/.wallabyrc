@@ -1,0 +1,24 @@
+var babel = require('babel');
+
+module.exports = function(wallaby) {
+  return {
+    files: [
+      'lib/**/*.js'
+    ],
+    tests: [
+      'test/*.coffee'
+    ],
+    debug: true,
+    env: {
+      type: 'node',
+      runner: 'node'
+    },
+    compilers: {
+      'lib/**/*.js': wallaby.compilers.babel({
+        babel: babel,
+        stage: 0
+      }),
+      '**/*.coffee': wallaby.compilers.coffeeScript({})
+    }
+  };
+};
