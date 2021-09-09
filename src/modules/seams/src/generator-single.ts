@@ -1,8 +1,7 @@
-/* eslint complexity: "off", max-statements: "off", no-param-reassign: "Off", no-multi-assign: "off", no-magic-numbers: "off", voice/curly-except-return: "off", class-methods-use-this: "off", max-params: "off", no-negated-condition: "off", prefer-destructuring: "off", max-nested-callbacks: "off", no-unused-expressions: "off" */
+/* eslint complexity: "off", max-statements: "off", no-param-reassign: "Off", no-multi-assign: "off", no-magic-numbers: "off", voice/curly-except-return: "off", class-methods-use-this: "off", max-params: "off", no-negated-condition: "off", prefer-destructuring: "off", max-nested-callbacks: "off", no-unused-expressions: "off", no-bitwise: "off" */
 
-import { encodeToBytes as intEncode } from '@modules/javascript-vle-integers/src/encode';
+import { encode as intEncode } from 'vle-integers';
 import matrices from './matrices';
-import timer from 'timer-decorator';
 import { imageData } from './get-image-data';
 
 /**
@@ -210,48 +209,58 @@ function recomputeCollectedAtPixel(x, y) {
 // const HIGH_ENERGY = 1E10;
 // const LOW_ENERGY  = -1E10;
 
+export type generatorOptions = {
+  forceDiagonals?: boolean;
+  stepSize?: number;
+  mergeSize?: number;
+  direction?: 'vertical' | 'horizontal';
+  maxSeams?: number;
+  percentage?: number;
+};
+
 class Generator {
-  compressed!: boolean;
+  forceDiagonals = true;
+  stepSize = 2;
+  mergeSize = 1;
+  direction: 'vertical' | 'horizontal' = 'vertical';
+  maxSeams = Infinity;
+  percentage = 0.5;
+  isDirty = false;
+
   data!: number[];
-  direction!: 'horizontal' | 'vertical';
+  // direction!: 'horizontal' | 'vertical';
   energyMap!: number[][];
   height!: number;
   image!: imageData;
   imgPromise: Promise<void>;
-  isDirty = false;
-  mergeSize!: number;
-  stepSize!: number;
+  // mergeSize!: number;
+  // stepSize!: number;
   width!: number;
 
-  constructor(imgPromise: Promise<imageData>) {
+  constructor(imgPromise: Promise<imageData>, options: generatorOptions = {}) {
+    this.#setOptions(options);
+
     this.imgPromise = imgPromise.then((img) => {
       this.image = img;
       this.data = img.data;
     });
-
-    // set defaults
-    this.setCompression(false)
-      .setSpacing()
-      .setMerging()
-      .setDirection()
-      .setPercentage();
   }
 
   /**
    * Rotates the image by 90 degrees for when we want to compute horizontal seams.  This simplifies all of the
    *   algorithms because we're now only working with seemingly horizontal seams :)
    */
-  async #setRotation(): Promise<void> {
-    await this.imgPromise;
+  // async #setRotation(): Promise<void> {
+  //   await this.imgPromise;
 
-    if (this.direction === 'vertical') {
-      this.width = this.image.width;
-      this.height = this.image.height;
-    } else {
-      this.height = this.image.width;
-      this.width = this.image.height;
-    }
-  }
+  //   if (this.direction === 'vertical') {
+  //     this.width = this.image.width;
+  //     this.height = this.image.height;
+  //   } else {
+  //     this.height = this.image.width;
+  //     this.width = this.image.height;
+  //   }
+  // }
 
   energyAtPixel(
     x: number,
@@ -293,7 +302,6 @@ class Generator {
     return Math.sqrt(xSum * xSum + ySum * ySum) || 1e-10;
   }
 
-  @timer
   #generateEnergyMap() {
     // woo-hoo, nothing to do!
     if (!this.isDirty) {
@@ -458,7 +466,6 @@ class Generator {
   /**
    * Computes the cumulative energy at each pixel top-down
    */
-  @timer
   #computeLowestSeamEnergies() {
     const energy = this.energyMap;
     const collected = (this.collectedMap = [this.energyMap[0].slice()]);
@@ -476,7 +483,7 @@ class Generator {
               (x ? (prevRow[x - 1] < (prevRow[x + 1] || Infinity) ? -1 : 1) : 1)
           ];
 
-        if (!this.compressed && prevRow[x] < min) {
+        if (!this.forceDiagonals && prevRow[x] < min) {
           min = prevRow[x];
         }
 
@@ -509,7 +516,6 @@ class Generator {
    * Removes a seam from the energy map and lowest computed energies by re-calculating only the pieces of the energy and
    *   seam maps that are directly affected by the seam.
    */
-  // @timer
   #removeSeamFromEnergy(seam) {
     const mergeSize = this.mergeSize;
     const height = this.height;
@@ -609,7 +615,7 @@ class Generator {
     // find lowest energy end-point
     const energyRows = this.collectedMap;
     const lastRow = energyRows[this.height - 1];
-    const { stepSize, mergeSize, compressed, width } = this;
+    const { stepSize, mergeSize, forceDiagonals, width } = this;
     let minEnergy = Infinity;
     let column = 0;
 
@@ -647,21 +653,21 @@ class Generator {
 
       let nextSteps = [
         sumAdjoiningVals(energyRow, center, mergeSize, -1, width),
-        compressed ? Infinity : 0,
+        forceDiagonals ? Infinity : 0,
         sumAdjoiningVals(energyRow, center, mergeSize, +1, width),
       ];
 
       for (let j = 0; j < mergeSize; j++) {
-        // only calculate the straight values if not compressed
-        compressed || (nextSteps[1] += energyRow[column + j]);
+        // only calculate the straight values if not forceDiagonals
+        forceDiagonals || (nextSteps[1] += energyRow[column + j]);
       }
 
       // compare left and right
       let dir =
         (nextSteps[0] || Infinity) < (nextSteps[2] || Infinity) ? -1 : 1;
 
-      // if not compressed, compare smaller of left/right to center
-      if (!compressed) {
+      // if not using forceDiagonals, compare smaller of left/right to center
+      if (!forceDiagonals) {
         dir =
           (nextSteps[1 + dir] || Infinity) < (nextSteps[1] || Infinity)
             ? dir
@@ -688,13 +694,11 @@ class Generator {
 
     await this.imgPromise;
 
-    this.#setRotation();
     this.#generateEnergyMap();
     this.#computeLowestSeamEnergies();
     this.#generateSeams();
   }
 
-  @timer
   #generateSeams(): Promise<void> {
     const numSeams = Math.ceil(
       Math.min(this.seamLimit, (this.width / this.stepSize) * this.percentSeams)
@@ -740,86 +744,48 @@ class Generator {
     });
   }
 
-  /**
-   * Improves seam compression by disabling "straight" sections of a seam, meaning that a seam _must_ move diagonally
-   *   at every pixel.  This generally doesn't create a noticeable visual difference.  Makes seams 40% smaller.
-   */
-  setCompression(enabled = true) {
-    if (this.compressed !== enabled) this.#setDirty();
-    this.compressed = enabled;
-
-    return this;
+  #setOptions(options: generatorOptions): void {
+    this.#verifyOptions(options);
+    Object.assign(this, options);
   }
 
-  //
+  #verifyOptions(options: generatorOptions): void {
+    const { stepSize, mergeSize, maxSeams } = options;
 
-  /**
-   * Skips every Nth pixel along the seam allowing for significantly smaller, but less accurate seams.
-   */
-  setSpacing(level = 1) {
-    if (level < 1 || level > 15) {
-      throw new Error('setSpacing only accepts levels in the range of 1..15');
+    this.#verifyStepSize(stepSize);
+    this.#verifyMergeSize(mergeSize);
+    this.#verifyMaxSeams(options, maxSeams);
+    this.#setDirtyIfOptionsChanged(options);
+  }
+
+  #verifyStepSize(stepSize?: number): void {
+    if (stepSize && (stepSize < 1 || stepSize > 15)) {
+      throw new Error('stepSize must be in the range of 1..15');
     }
-
-    level = Math.round(level);
-
-    if (this.stepSize !== level) this.#setDirty();
-    this.stepSize = level;
-
-    return this;
   }
 
-  /**
-   * Remove N neighboring pixels from each seam instead of 1.  Allows for significantly smaller, but less accurate seams
-   *   (this can be significantly more noticeable than the effect of `setSpacing`)
-   */
-  setMerging(level = 1) {
-    if (level < 1 || level > 4) {
-      throw new Error('setMerging only accepts levels in the range of 1..4');
+  #verifyMergeSize(mergeSize?: number): void {
+    if (mergeSize && (mergeSize < 1 || mergeSize > 4)) {
+      throw new Error('mergeSize must be in the range of 1..4');
     }
-
-    level = Math.round(level);
-
-    if (this.mergeSize !== level) this.#setDirty();
-    this.mergeSize = level;
-
-    return this;
   }
 
-  /**
-   * Sets the direction of the seams to generate.  Default is 'vertical'
-   */
-  setDirection(dir: 'vertical' | 'horizontal' = 'vertical') {
-    if (this.direction !== dir) this.#setDirty();
-    this.direction = dir;
-
-    return this;
+  #verifyMaxSeams(options: generatorOptions, maxSeams?: number): void {
+    if (maxSeams && maxSeams === -1) {
+      options.maxSeams = Infinity;
+    }
   }
 
-  /**
-   * Sets a limit on the maximum number of seams to create
-   */
-  setMaxSeams(limit = Infinity) {
-    if (this.seamLimit !== limit) this.#setDirty();
-    this.seamLimit = limit;
-
-    return this;
+  #setDirtyIfOptionsChanged(options: generatorOptions): void {
+    let key: keyof generatorOptions;
+    for (key in options) {
+      if (this[key] !== options[key]) {
+        this.#setDirty();
+      }
+    }
   }
 
-  /**
-   * Generate this % of seams, default = 100.  e.g with a value of `50`, a 1024x768 image could be scaled down to 512px
-   *   wide.
-   */
-  setPercentage(percent = 100) {
-    percent /= 100;
-
-    if (this.percentSeams !== percent) this.#setDirty();
-    this.percentSeams = percent;
-
-    return this;
-  }
-
-  #isVertical() {
+  #isVertical(): boolean {
     return this.direction === 'vertical';
   }
 
@@ -829,28 +795,24 @@ class Generator {
     return this;
   }
 
-  /**
-   * Returns the encoded seams
-   */
-  encode() {
-    return this.getSeamData(true).then((seamData) => this.#encode(seamData));
+  async encode(): Promise<string> {
+    const seamData = await this.getSeamData(true);
+
+    return this.#encode(seamData);
   }
 
-  @timer
   #encode(seamData) {
     const bytes = [];
-    const compressed = this.compressed;
+    const forceDiagonals = this.forceDiagonals;
 
-    bytes.push.apply(
-      bytes,
-      [].concat(
-        // flattens the following data
+    bytes.push(
+      ...[].concat(
         (this.stepSize <<
           (4 + // <4 bits> step size
             ((this.mergeSize - 1) << 2) + // <2 bits> merge size
             (this.vertical ? 0 : 1))) <<
           (1 + // <1 bit>  vertical or horizontal
-            (this.compressed ? 1 : 0)), // <1 bit>  compressed or not
+            (this.forceDiagonals ? 1 : 0)), // <1 bit>  forceDiagonals or not
         intEncode(this.width), // <varInt> width
         intEncode(this.height), // <varInt> height
         intEncode(this.numSeams) // <varInt> # of seams
@@ -860,10 +822,10 @@ class Generator {
     // converts all seams into a byte stream in the format:
     // [starting pixel number]
     // bits consiting of:
-    //   compressed mode:
+    //   forceDiagonals mode:
     //     0 = left  / down
     //     1 = right / up
-    //   uncompressed mode:
+    //   not forceDiagonals mode:
     //     0  = left  / down
     //     10 = straight
     //     11 = right / up
@@ -877,7 +839,7 @@ class Generator {
         const val = seam[i];
         const prev = seam[i - 1];
 
-        if (compressed && val === prev) {
+        if (forceDiagonals && val === prev) {
           throw new Error(
             'Error encoding seam -- unexpected straight seam detected'
           );
@@ -887,10 +849,10 @@ class Generator {
           val < prev
             ? [0] // there are only 3 possible values, so we can always encode one with a single bit
             : val > prev
-            ? compressed
+            ? forceDiagonals
               ? [1]
               : [1, 0]
-            : compressed
+            : forceDiagonals
             ? null
             : [1, 1];
 
