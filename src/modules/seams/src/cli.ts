@@ -1,12 +1,10 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import packageJSON from '../package.json';
+import glob from 'globby';
 
-const Program = require('node-incoming');
-const packageJSON = require('../package.json');
-const Promise = require('bluebird');
-const glob = Promise.promisify(require('glob'));
+import Generator from './generator';
 const resolvePath = require('path-resolve');
-const Generator = require('./generator');
 
 const app = new Program()
   .version(packageJSON.version)
@@ -18,10 +16,14 @@ const app = new Program()
   .option('--merging, -m <Number>', 'Sets merging level')
   .option('--direction, -d <vertical|horizontal|both>', 'Sets seam direction')
   .option('--max-seams, -x <Number>', 'Sets maximum # of seams (per direction)')
-  .option('--percentage, -p <0..100>', 'Sets % of seams to generate relative to the image ' + 'width/height')
+  .option(
+    '--percentage, -p <0..100>',
+    'Sets % of seams to generate relative to the image ' + 'width/height'
+  )
   .option(
     '--out, -o <Path>',
-    'Folder to write seam files to.  Will write to the same ' + 'folder as the image if not set.',
+    'Folder to write seam files to.  Will write to the same ' +
+      'folder as the image if not set.'
   )
   .processArgs();
 
@@ -34,17 +36,17 @@ function flattenArray(ary, levels) {
   return ary;
 }
 
-app.on('call', function(args) {
+app.on('call', function (args) {
   if (!args._.length) {
     throw new Error('Must provide file(s) to process');
   }
 
-  var globs = args._.map(pattern => glob(pattern));
+  var globs = args._.map((pattern) => glob(pattern));
 
   Promise.all(globs)
     .then(flattenArray)
     .map(resolvePath)
-    .map(function(file) {
+    .map(function (file) {
       console.log('Encoding ' + file);
 
       new Generator(file)
@@ -55,13 +57,13 @@ app.on('call', function(args) {
         .setMaxSeams(args.maxSeams)
         .setPercentage(args.perentage)
         .encode()
-        .then(function(data) {
+        .then(function (data) {
           console.log(`Encoded ${file}`);
 
           var parsed = path.parse(file);
           var filePath = path.join(args.o || parsed.dir, parsed.name + '.seam');
 
-          fs.writeFile(filePath, data, function(err) {
+          fs.writeFile(filePath, data, function (err) {
             if (err) {
               throw err;
             } else {
@@ -69,12 +71,12 @@ app.on('call', function(args) {
             }
           });
         })
-        .catch(function(err) {
+        .catch(function (err) {
           throw err;
         });
     });
 });
 
-process.on('unhandledRejection', p => console.error(p.stack));
+process.on('unhandledRejection', (p) => console.error(p.stack));
 
 module.exports = app;

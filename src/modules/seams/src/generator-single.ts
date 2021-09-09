@@ -1,27 +1,34 @@
-// @flow
+/* eslint complexity: "off", max-statements: "off", no-param-reassign: "Off", no-multi-assign: "off", no-magic-numbers: "off", voice/curly-except-return: "off", class-methods-use-this: "off", max-params: "off", no-negated-condition: "off", prefer-destructuring: "off", max-nested-callbacks: "off", no-unused-expressions: "off", no-bitwise: "off" */
 
-import { array as intEncode } from 'vle-integers/encode';
+import { encode as intEncode } from 'vle-integers';
 import matrices from './matrices';
-import timer from 'timer-decorator';
+import { imageData } from './get-image-data';
 
 /**
- * converts a stepped "sparse" array into a dense one, e.g.:
+ * converts a stepped "sparse" arrays into a dense one, e.g.:
  *   [1, 3, 5, 3] -> [1, 2, 3, 4, 5, 4, 3]
  */
-function toDenseArray(seams: Array<number>, stepSize: number): Array<number> {
-  return seams.map(seam =>
-    [].concat.apply(
-      [],
-      seam.map((val, ix, ary) =>
-        Array.apply(0, Array(ix < ary.length - 1 ? stepSize : 1)).map(
-          (a, aIx) => val + (val < ary[ix + 1] ? 1 : -1) * aIx,
-        ),
-      ),
-    ),
-  );
+function toDenseArray(sparseArray: number[], stepSize: number) {
+  return sparseArray
+    .map((val, ix, ary) =>
+      Array.from({ length: ix < ary.length - 1 ? stepSize : 1 }).map(
+        (a, aIx) => val + (val < ary[ix + 1] ? 1 : -1) * aIx
+      )
+    )
+    .flat();
 }
 
-function sumAdjoiningVals(ary, aryIndex, count, direction, aryLength) {
+function to2DDenseArray(seams: number[][], stepSize: number): number[][] {
+  return seams.map((seam) => toDenseArray(seam, stepSize));
+}
+
+function sumAdjoiningVals(
+  ary: number[],
+  aryIndex: number,
+  count: number,
+  direction: number,
+  aryLength: number
+) {
   let ttl = 0;
 
   for (let i = aryIndex + direction; i >= 0 && i < aryLength; i += direction) {
@@ -38,6 +45,7 @@ function sumAdjoiningVals(ary, aryIndex, count, direction, aryLength) {
   return ttl;
 }
 
+/*
 function adjoiningValues(ary, aryLen, x) {
   let center = x;
   let left = x - 1;
@@ -68,17 +76,31 @@ function adjoiningValues(ary, aryLen, x) {
 
   return [ary[left] || 0, ary[center], ary[right] || 0];
 }
+*/
 
-function rightIsCloser(left, center, right) {
+function rightIsCloser(left: number, center: number, right: number): boolean {
   return left - center - center - right < 0;
 }
 
-function pxEnergy(pxData, cols, x, y) {
+function pxEnergy(
+  pxData: number[],
+  cols: number,
+  x: number,
+  y: number
+): number {
   const ix = (y * cols + x) * 4;
-  return (pxData[ix] + pxData[ix + 1] + pxData[ix + 2]) * pxData[ix + 3];
+
+  return (pxData[ix]! + pxData[ix + 1]! + pxData[ix + 2]!) * pxData[ix + 3]!;
 }
 
-function recomputeEnergyAtPixel(x, y, energyMap, pxData, rows, cols) {
+function recomputeEnergyAtPixel(
+  x: number,
+  y: number,
+  energyMap: number[][],
+  pxData: number[][],
+  rows: number,
+  cols: number
+) {
   const up = y;
   const down = y < rows - 1;
   let left;
@@ -94,7 +116,7 @@ function recomputeEnergyAtPixel(x, y, energyMap, pxData, rows, cols) {
     left = x - 1;
     right = x + 1;
     center = x;
-    row = pxData[y - 1];
+    row = pxData[y - 1]!;
 
     while (!row[left] && left-- > 0);
     while (!row[right] && right++ < cols);
@@ -187,55 +209,102 @@ function recomputeCollectedAtPixel(x, y) {
 // const HIGH_ENERGY = 1E10;
 // const LOW_ENERGY  = -1E10;
 
+export type generatorOptions = {
+  forceDiagonals?: boolean;
+  stepSize?: number;
+  mergeSize?: number;
+  direction?: 'vertical' | 'horizontal';
+  maxSeams?: number;
+  percentage?: number;
+};
+
 class Generator {
-  /**
-   * Creates a seam generator
-   *
-   * @param  {String} imgSrc path to image
-   * @constructor
-   */
-  constructor(imgPromise) {
-    this.imgPromise = imgPromise.then(img => {
+  forceDiagonals = true;
+  stepSize = 2;
+  mergeSize = 1;
+  direction: 'vertical' | 'horizontal' = 'vertical';
+  maxSeams = Infinity;
+  percentage = 0.5;
+  isDirty = false;
+
+  data!: number[];
+  // direction!: 'horizontal' | 'vertical';
+  energyMap!: number[][];
+  height!: number;
+  image!: imageData;
+  imgPromise: Promise<void>;
+  // mergeSize!: number;
+  // stepSize!: number;
+  width!: number;
+
+  constructor(imgPromise: Promise<imageData>, options: generatorOptions = {}) {
+    this.#setOptions(options);
+
+    this.imgPromise = imgPromise.then((img) => {
       this.image = img;
       this.data = img.data;
     });
-
-    // set defaults
-    this.setCompression(false)
-      .setSpacing()
-      .setMerging()
-      .setDirection()
-      .setPercentage();
   }
 
   /**
    * Rotates the image by 90 degrees for when we want to compute horizontal seams.  This simplifies all of the
    *   algorithms because we're now only working with seemingly horizontal seams :)
-   *
-   * @private
-   * @chainable
    */
-  setRotation() {
-    return this.imgPromise.then(
-      function() {
-        if (this.direction === 'vertical') {
-          this.width = this.image.width;
-          this.height = this.image.height;
-        } else {
-          this.height = this.image.width;
-          this.width = this.image.height;
-        }
-      }.bind(this),
-    );
+  // async #setRotation(): Promise<void> {
+  //   await this.imgPromise;
+
+  //   if (this.direction === 'vertical') {
+  //     this.width = this.image.width;
+  //     this.height = this.image.height;
+  //   } else {
+  //     this.height = this.image.width;
+  //     this.width = this.image.height;
+  //   }
+  // }
+
+  energyAtPixel(
+    x: number,
+    y: number,
+    pxData: number[],
+    rows: number,
+    cols: number
+  ): number {
+    const up = y;
+    const down = y < rows - 1;
+    const left = x;
+    const right = x < cols - 1;
+    let tmp;
+
+    let xSum = 0;
+    let ySum = 0;
+
+    left &&
+      ((xSum += -2 * pxEnergy(pxData, cols, x - 1, y)),
+      up &&
+        ((xSum += tmp = -1 * pxEnergy(pxData, cols, x - 1, y - 1)),
+        (ySum += tmp)),
+      down &&
+        ((xSum += -1 * (tmp = pxEnergy(pxData, cols, x - 1, y + 1))),
+        (ySum += tmp)));
+
+    right &&
+      ((xSum += 2 * pxEnergy(pxData, cols, x + 1, y)),
+      up &&
+        ((xSum += tmp = pxEnergy(pxData, cols, x + 1, y - 1)),
+        (ySum += -1 * tmp)),
+      down &&
+        ((xSum += tmp = pxEnergy(pxData, cols, x + 1, y + 1)), (ySum += tmp)));
+
+    up && (ySum += -2 * pxEnergy(pxData, cols, x, y - 1));
+    down && (ySum += +2 * pxEnergy(pxData, cols, x, y + 1));
+
+    // don't allow zero values because we take some shortcuts and assume that falsey values are undefined
+    return Math.sqrt(xSum * xSum + ySum * ySum) || 1e-10;
   }
 
-  /**
-   * @private
-   */
-  @timer
-  generateEnergyMap() {
+  #generateEnergyMap() {
     // woo-hoo, nothing to do!
-    if (!this.dirty) {
+    if (!this.isDirty) {
       return Promise.resolve();
     }
 
@@ -244,39 +313,12 @@ class Generator {
     const pxData = this.data;
     const energyMap = (this.energyMap = new Array(rows));
 
-    function energyAtPixel(x, y, pxData, rows, cols) {
-      const up = y;
-      const down = y < rows - 1;
-      const left = x;
-      const right = x < cols - 1;
-      let tmp;
-
-      let xSum = 0;
-      let ySum = 0;
-
-      left &&
-        ((xSum += -2 * pxEnergy(pxData, cols, x - 1, y)),
-        up && ((xSum += tmp = -1 * pxEnergy(pxData, cols, x - 1, y - 1)), (ySum += tmp)),
-        down && ((xSum += -1 * (tmp = pxEnergy(pxData, cols, x - 1, y + 1))), (ySum += tmp)));
-
-      right &&
-        ((xSum += 2 * pxEnergy(pxData, cols, x + 1, y)),
-        up && ((xSum += tmp = pxEnergy(pxData, cols, x + 1, y - 1)), (ySum += -1 * tmp)),
-        down && ((xSum += tmp = pxEnergy(pxData, cols, x + 1, y + 1)), (ySum += tmp)));
-
-      up && (ySum += -2 * pxEnergy(pxData, cols, x, y - 1));
-      down && (ySum += +2 * pxEnergy(pxData, cols, x, y + 1));
-
-      // don't allow zero values because we take some shortcuts and assume that falsey values are undefined
-      return Math.sqrt(xSum * xSum + ySum * ySum) || 1e-10;
-    }
-
-    return this.imgPromise.then(function() {
+    return this.imgPromise.then(() => {
       for (let y = 0; y < rows; y++) {
         energyMap[y] = new Array(cols);
 
         for (let x = 0; x < cols; x++) {
-          energyMap[y][x] = energyAtPixel(x, y, pxData, rows, cols);
+          energyMap[y][x] = this.energyAtPixel(x, y, pxData, rows, cols);
         }
       }
     });
@@ -284,26 +326,28 @@ class Generator {
 
   /**
    * Computes the energy at a given pixel, taking into account that the neighboring pixels might be NaN
-   *
-   * @private
    */
-  // computeEnergyAtPixel(x, y) {
-  //   return this.gradientMagnitude(x, y);
-  // }
+  #computeEnergyAtPixel(x: number, y: number): number {
+    return this.#gradientMagnitude(x, y);
+  }
 
   /**
    * Gets the cumulative (R+G+B) * A energy at a pixel normalized to 0..1
-   *
-   * @private
    */
-  getPixelSubEnergy(x, y) {
+  #getPixelSubEnergy(x: number, y: number): number {
     if (x < 0 || y < 0 || x >= this.width || y >= this.height) {
       return 0;
     }
 
     const ix = (y * this.width + x) * 4;
 
-    return (this.data[ix + 0] + this.data[ix + 1] + this.data[ix + 2]) * this.data[ix + 3] / 255 / 255 / 3;
+    return (
+      ((this.data[ix + 0] + this.data[ix + 1] + this.data[ix + 2]) *
+        this.data[ix + 3]) /
+      255 /
+      255 /
+      3
+    );
   }
 
   /**
@@ -314,10 +358,8 @@ class Generator {
    *      [-1 0 +1]       [+1 +2 +1]
    *
    * G = sqrt(Gx^2 + Gy^2)
-   *
-   * @private
    */
-  gradientMagnitude(x, y) {
+  #gradientMagnitude(x: number, y: number): number {
     const cols = this.width;
     const rows = this.height;
     const matrixX = matrices.gradientMagnitudeX;
@@ -329,7 +371,7 @@ class Generator {
       let left = x - 1;
       let right = x + 1;
       let center = x;
-      let mapRow = this.energyMap[y + row];
+      const mapRow = this.energyMap[y + row];
 
       if (mapRow) {
         // if the center pixel doesn't exist, make it "take" the left or right pixel
@@ -354,14 +396,26 @@ class Generator {
       let tmp = null;
 
       xSum +=
-        (!(tmp = matrixX[row + 1][0]) ? 0 : tmp * this.getPixelSubEnergy(left, y + row)) +
-        (!(tmp = matrixX[row + 1][1]) ? 0 : tmp * this.getPixelSubEnergy(center, y + row)) +
-        (!(tmp = matrixX[row + 1][2]) ? 0 : tmp * this.getPixelSubEnergy(right, y + row));
+        (!(tmp = matrixX[row + 1]![0])
+          ? 0
+          : tmp * this.#getPixelSubEnergy(left, y + row)) +
+        (!(tmp = matrixX[row + 1]![1])
+          ? 0
+          : tmp * this.#getPixelSubEnergy(center, y + row)) +
+        (!(tmp = matrixX[row + 1]![2])
+          ? 0
+          : tmp * this.#getPixelSubEnergy(right, y + row));
 
       ySum +=
-        (!(tmp = matrixY[row + 1][0]) ? 0 : tmp * this.getPixelSubEnergy(left, y + row)) +
-        (!(tmp = matrixY[row + 1][1]) ? 0 : tmp * this.getPixelSubEnergy(center, y + row)) +
-        (!(tmp = matrixY[row + 1][2]) ? 0 : tmp * this.getPixelSubEnergy(right, y + row));
+        (!(tmp = matrixY[row + 1]![0])
+          ? 0
+          : tmp * this.#getPixelSubEnergy(left, y + row)) +
+        (!(tmp = matrixY[row + 1]![1])
+          ? 0
+          : tmp * this.#getPixelSubEnergy(center, y + row)) +
+        (!(tmp = matrixY[row + 1]![2])
+          ? 0
+          : tmp * this.#getPixelSubEnergy(right, y + row));
     }
 
     return Math.sqrt(xSum * xSum + ySum * ySum);
@@ -369,10 +423,8 @@ class Generator {
 
   /**
    * Computes the collected energy at a given pixel, taking into account that relevant pixels might be NaN
-   *
-   * @private
    */
-  computeCollectedEnergyAtPixel(x, y) {
+  #computeCollectedEnergyAtPixel(x: number, y: number): number {
     // if the pixel was removed from the energy map, ignore it
     if (!this.energyMap[y][x]) {
       return NaN;
@@ -394,36 +446,44 @@ class Generator {
         left--;
       } else {
         center++;
-        left++;
+        left++; // TODO: should this be right++?
       }
     }
 
-    let leftVal = sumAdjoiningVals(energyRow, left, 1, -1, cols);
-    let rightVal = sumAdjoiningVals(energyRow, right, 1, +1, cols);
+    const leftVal = sumAdjoiningVals(energyRow, left, 1, -1, cols);
+    const rightVal = sumAdjoiningVals(energyRow, right, 1, +1, cols);
 
-    return this.energyMap[y][x] + Math.min(leftVal || Infinity, energyRow[center] || Infinity, rightVal || Infinity);
+    return (
+      this.energyMap[y][x] +
+      Math.min(
+        leftVal || Infinity,
+        energyRow[center] || Infinity,
+        rightVal || Infinity
+      )
+    );
   }
 
   /**
    * Computes the cumulative energy at each pixel top-down
-   *
-   * @private
    */
-  @timer
-  computeLowestSeamEnergies() {
+  #computeLowestSeamEnergies() {
     const energy = this.energyMap;
     const collected = (this.collectedMap = [this.energyMap[0].slice()]);
     const cols = this.width;
     const rows = this.height;
 
     for (let y = 1; y < rows; y++) {
-      let row = new Array(cols);
+      const row = new Array(cols);
 
       for (let x = 0; x < cols; x++) {
-        let prevRow = collected[y - 1];
-        let min = prevRow[x + (x ? (prevRow[x - 1] < (prevRow[x + 1] || Infinity) ? -1 : 1) : 1)];
+        const prevRow = collected[y - 1];
+        let min =
+          prevRow[
+            x +
+              (x ? (prevRow[x - 1] < (prevRow[x + 1] || Infinity) ? -1 : 1) : 1)
+          ];
 
-        if (!this.compressed && prevRow[x] < min) {
+        if (!this.forceDiagonals && prevRow[x] < min) {
           min = prevRow[x];
         }
 
@@ -438,29 +498,25 @@ class Generator {
 
   /**
    * Recalculates both the energy map and collected energy at a given pixel
-   *
-   * @param  {Number} x x
-   * @param  {Number} y y
-   * @return {Boolean} true if data at pixel changed
    */
-  recalcMapAt(x, y) {
-    const energyAtPixel = this.computeEnergyAtPixel(x, y);
+  recalcMapAt(x: number, y: number): boolean {
+    const energyAtPixel = this.#computeEnergyAtPixel(x, y);
     this.energyMap[y][x] = energyAtPixel;
 
-    let collectedAtPixel = this.computeCollectedEnergyAtPixel(y, x);
+    let collectedAtPixel = this.#computeCollectedEnergyAtPixel(y, x);
 
-    return energyAtPixel === this.energyMap[y][x] && collectedAtPixel === this.collectedMap[y][x];
+    // true if data at pixel changed
+    return (
+      energyAtPixel === this.energyMap[y][x] &&
+      collectedAtPixel === this.collectedMap[y][x]
+    );
   }
 
   /**
    * Removes a seam from the energy map and lowest computed energies by re-calculating only the pieces of the energy and
    *   seam maps that are directly affected by the seam.
-   *
-   * @private
-   * @chainable
    */
-  // @timer
-  removeSeamFromEnergy(seam) {
+  #removeSeamFromEnergy(seam) {
     const mergeSize = this.mergeSize;
     const height = this.height;
     const width = this.width;
@@ -481,7 +537,14 @@ class Generator {
     }
 
     function recalcMaps(x, y, energyMap, collectedMap, pxData, rows, cols) {
-      let energyChanged = recomputeEnergyAtPixel(x, y, energyMap, pxData, rows, cols);
+      let energyChanged = recomputeEnergyAtPixel(
+        x,
+        y,
+        energyMap,
+        pxData,
+        rows,
+        cols
+      );
       let collectedChanged = recomputeCollectedAtPixel(x, y);
 
       return energyChanged || collectedChanged;
@@ -493,19 +556,47 @@ class Generator {
       let seamR = Math.min(width - 1, seam[y] + mergeSize - 1);
       let lastRow = y === this.height - 1;
 
-      minCol = Math.max(0, Math.min(minCol - 1, seamL - 1, lastRow ? Infinity : seam[y + 1] - mergeSize));
-      maxCol = Math.min(width, Math.max(maxCol + 1, seamR + 1, lastRow ? 0 : seam[y + 1] + mergeSize));
+      minCol = Math.max(
+        0,
+        Math.min(
+          minCol - 1,
+          seamL - 1,
+          lastRow ? Infinity : seam[y + 1] - mergeSize
+        )
+      );
+      maxCol = Math.min(
+        width,
+        Math.max(maxCol + 1, seamR + 1, lastRow ? 0 : seam[y + 1] + mergeSize)
+      );
 
       // for each value at the left or right edges that hasn't changed, narrow the range
-      try {
-        while (minCol < seamL && !recalcMaps(minCol, y, energyMap, collectedMap, this.data, height, width)) {
-          minCol++;
-        }
-        while (maxCol > seamR && !recalcMaps(maxCol, y, energyMap, collectedMap, this.data, height, width)) {
-          maxCol--;
-        }
-      } catch (err) {
-        throw err;
+      while (
+        minCol < seamL &&
+        !recalcMaps(
+          minCol,
+          y,
+          energyMap,
+          collectedMap,
+          this.data,
+          height,
+          width
+        )
+      ) {
+        minCol++;
+      }
+      while (
+        maxCol > seamR &&
+        !recalcMaps(
+          maxCol,
+          y,
+          energyMap,
+          collectedMap,
+          this.data,
+          height,
+          width
+        )
+      ) {
+        maxCol--;
       }
 
       // recalculate all values that must propogate to the next row
@@ -519,18 +610,12 @@ class Generator {
 
   /**
    * Creates an individual seam from the active energy map
-   *
-   * @private
-   * @return {Array} seam
    */
-  createSeam(debug) {
+  #createSeam(): number[] {
     // find lowest energy end-point
     const energyRows = this.collectedMap;
     const lastRow = energyRows[this.height - 1];
-    const stepSize = this.stepSize;
-    const mergeSize = this.mergeSize;
-    const compressed = this.compressed;
-    const width = this.width;
+    const { stepSize, mergeSize, forceDiagonals, width } = this;
     let minEnergy = Infinity;
     let column = 0;
 
@@ -568,21 +653,25 @@ class Generator {
 
       let nextSteps = [
         sumAdjoiningVals(energyRow, center, mergeSize, -1, width),
-        compressed ? Infinity : 0,
+        forceDiagonals ? Infinity : 0,
         sumAdjoiningVals(energyRow, center, mergeSize, +1, width),
       ];
 
       for (let j = 0; j < mergeSize; j++) {
-        // only calculate the straight values if not compressed
-        compressed || (nextSteps[1] += energyRow[column + j]);
+        // only calculate the straight values if not forceDiagonals
+        forceDiagonals || (nextSteps[1] += energyRow[column + j]);
       }
 
       // compare left and right
-      let dir = (nextSteps[0] || Infinity) < (nextSteps[2] || Infinity) ? -1 : 1;
+      let dir =
+        (nextSteps[0] || Infinity) < (nextSteps[2] || Infinity) ? -1 : 1;
 
-      // if not compressed, compare smaller of left/right to center
-      if (!compressed) {
-        dir = (nextSteps[1 + dir] || Infinity) < (nextSteps[1] || Infinity) ? dir : 0;
+      // if not using forceDiagonals, compare smaller of left/right to center
+      if (!forceDiagonals) {
+        dir =
+          (nextSteps[1 + dir] || Infinity) < (nextSteps[1] || Infinity)
+            ? dir
+            : 0;
       }
 
       seam.push((column += dir * stepSize));
@@ -593,43 +682,39 @@ class Generator {
 
   /**
    * Generates seams for the given image.
-   *
-   * @return {Promise}
    */
-  generateSeams() {
+  async generateSeams(): Promise<void> {
     // woo-hoo, nothing to do!
-    if (!this.dirty) {
-      return Promise.resolve(this);
+    if (!this.isDirty) {
+      return;
     }
     if (!this.imgPromise) {
       throw new Error('Must set an image before generating seams');
     }
 
-    return this.imgPromise
-      .then(::this.setRotation)
-      .then(::this.generateEnergyMap)
-      .then(::this.computeLowestSeamEnergies)
-      .then(::this.__generateSeams);
+    await this.imgPromise;
+
+    this.#generateEnergyMap();
+    this.#computeLowestSeamEnergies();
+    this.#generateSeams();
   }
 
-  /**
-   * @private
-   */
-  @timer
-  __generateSeams() {
-    const numSeams = Math.ceil(Math.min(this.seamLimit, this.width / this.stepSize * this.percentSeams));
+  #generateSeams(): Promise<void> {
+    const numSeams = Math.ceil(
+      Math.min(this.seamLimit, (this.width / this.stepSize) * this.percentSeams)
+    );
     const seams = new Array(numSeams);
 
     for (let i = 0; i < numSeams; i++) {
-      let seam = this.createSeam();
+      let seam = this.#createSeam();
       seams[i] = seam;
-      console.log(i, numSeams);
+      // console.log(i, numSeams);
       // console.log(seam.join(' '));
-      this.removeSeamFromEnergy(seam);
+      this.#removeSeamFromEnergy(seam);
     }
 
     this.seams = seams;
-    this.dirty = false;
+    this.isDirty = false;
   }
 
   /**
@@ -642,178 +727,109 @@ class Generator {
    * @return {Number}  return[0].step
    * @return {Boolean} return[0].vertical
    */
-  getSeamData(allowSparse) {
+  getSeamData(allowSparse = false) {
     return this.generateSeams().then(() => {
-      const seams = allowSparse || this.stepSize === 1 ? this.seams : toDenseArray(seams, this.stepSize);
+      const seams =
+        allowSparse || this.stepSize === 1
+          ? this.seams
+          : to2DDenseArray(seams, this.stepSize);
 
       return {
         width: this.width,
         height: this.height,
         seams: seams,
         mergeSize: this.mergeSize,
-        vertical: this.isVertical(),
+        vertical: this.#isVertical(),
       };
     });
   }
 
-  /**
-   * Improves seam compression by disabling "straight" sections of a seam, meaning that a seam _must_ move diagonally
-   *   at every pixel.  This generally doesn't create a noticeable visual difference.  Makes seams 40% smaller.
-   *
-   * @param {Bool} [enabled=true] Enables compression
-   * @chainable
-   */
-  setCompression(enabled) {
-    this.setDirty(this.compressed !== enabled);
-    this.compressed = enabled;
-
-    return this;
+  #setOptions(options: generatorOptions): void {
+    this.#verifyOptions(options);
+    Object.assign(this, options);
   }
 
-  //
+  #verifyOptions(options: generatorOptions): void {
+    const { stepSize, mergeSize, maxSeams } = options;
 
-  /**
-   * Skips every Nth pixel along the seam allowing for significantly smaller, but less accurate seams.
-   *
-   * @param {Number} [level=1] Skip every Nth pixel, must be in the range of 1..15
-   * @chainable
-   */
-  setSpacing(level = 1) {
-    if (level < 1 || level > 15) {
-      throw new Error('setSpacing only accepts levels in the range of 1..15');
+    this.#verifyStepSize(stepSize);
+    this.#verifyMergeSize(mergeSize);
+    this.#verifyMaxSeams(options, maxSeams);
+    this.#setDirtyIfOptionsChanged(options);
+  }
+
+  #verifyStepSize(stepSize?: number): void {
+    if (stepSize && (stepSize < 1 || stepSize > 15)) {
+      throw new Error('stepSize must be in the range of 1..15');
     }
-
-    level = Math.round(level);
-
-    this.setDirty(this.stepSize !== level);
-    this.stepSize = level;
-
-    return this;
   }
 
-  /**
-   * Remove N neighboring pixels from each seam instead of 1.  Allows for significantly smaller, but less accurate seams
-   *   (this can be significantly more noticeable than the effect of `setSpacing`)
-   * @param {[type]} level = 1 [description]
-   */
-  setMerging(level = 1) {
-    if (level < 1 || level > 4) {
-      throw new Error('setMerging only accepts levels in the range of 1..4');
+  #verifyMergeSize(mergeSize?: number): void {
+    if (mergeSize && (mergeSize < 1 || mergeSize > 4)) {
+      throw new Error('mergeSize must be in the range of 1..4');
     }
-
-    level = Math.round(level);
-
-    this.setDirty(this.mergeSize !== level);
-    this.mergeSize = level;
-
-    return this;
   }
 
-  /**
-   * Sets the direction of the seams to generate.  Default is 'vertical'
-   *
-   * @param {String} [dir='vertical'] 'vertical' or 'horizontal'
-   * @chainable
-   */
-  setDirection(dir = 'vertical') {
-    this.setDirty(this.direction !== dir);
-    this.direction = dir;
-
-    return this;
+  #verifyMaxSeams(options: generatorOptions, maxSeams?: number): void {
+    if (maxSeams && maxSeams === -1) {
+      options.maxSeams = Infinity;
+    }
   }
 
-  /**
-   * Sets a limit on the maximum number of seams to create
-   *
-   * @param {Number} [limit=Infinity] Maximum number of seams
-   * @chainable
-   */
-  setMaxSeams(limit = Infinity) {
-    this.setDirty(this.seamLimit !== limit);
-    this.seamLimit = limit;
-
-    return this;
+  #setDirtyIfOptionsChanged(options: generatorOptions): void {
+    let key: keyof generatorOptions;
+    for (key in options) {
+      if (this[key] !== options[key]) {
+        this.#setDirty();
+      }
+    }
   }
 
-  /**
-   * Generate this % of seams, default = 100.  e.g with a value of `50`, a 1024x768 image could be scaled down to 512px
-   *   wide.
-   *
-   * @param {[type]} [percent=100] [description]
-   */
-  setPercentage(percent = 100) {
-    percent /= 100;
-
-    this.setDirty(this.percentSeams !== percent);
-    this.percentSeams = percent;
-
-    return this;
-  }
-
-  /**
-   * @private
-   */
-  isVertical() {
+  #isVertical(): boolean {
     return this.direction === 'vertical';
   }
 
-  /**
-   * @private
-   * @chainable
-   */
-  setDirty(dirty = true) {
-    if (dirty) {
-      this.dirty = true;
-    }
+  #setDirty(): Generator {
+    this.isDirty = true;
 
     return this;
   }
 
-  /**
-   * Returns the encoded seams
-   *
-   * @return {Promise}
-   * @return {String} return[0]
-   */
-  encode() {
-    return this.getSeamData(true).then(::this.__encode);
+  async encode(): Promise<string> {
+    const seamData = await this.getSeamData(true);
+
+    return this.#encode(seamData);
   }
 
-  /**
-   * @private
-   */
-  @timer
-  __encode(seamData) {
+  #encode(seamData) {
     const bytes = [];
-    const compressed = this.compressed;
+    const forceDiagonals = this.forceDiagonals;
 
-    bytes.push.apply(
-      bytes,
-      [].concat(
-        // flattens the following data
+    bytes.push(
+      ...[].concat(
         (this.stepSize <<
           (4 + // <4 bits> step size
-          ((this.mergeSize - 1) << 2) + // <2 bits> merge size
+            ((this.mergeSize - 1) << 2) + // <2 bits> merge size
             (this.vertical ? 0 : 1))) <<
           (1 + // <1 bit>  vertical or horizontal
-            (this.compressed ? 1 : 0)), // <1 bit>  compressed or not
+            (this.forceDiagonals ? 1 : 0)), // <1 bit>  forceDiagonals or not
         intEncode(this.width), // <varInt> width
         intEncode(this.height), // <varInt> height
-        intEncode(this.numSeams), // <varInt> # of seams
-      ),
+        intEncode(this.numSeams) // <varInt> # of seams
+      )
     );
 
     // converts all seams into a byte stream in the format:
     // [starting pixel number]
     // bits consiting of:
-    //   compressed mode:
+    //   forceDiagonals mode:
     //     0 = left  / down
     //     1 = right / up
-    //   uncompressed mode:
+    //   not forceDiagonals mode:
     //     0  = left  / down
     //     10 = straight
     //     11 = right / up
-    seamData.seams.forEach(function(seam) {
+    seamData.seams.forEach(function (seam) {
       let bitNum = 7;
       let byte = 0;
 
@@ -823,14 +839,22 @@ class Generator {
         const val = seam[i];
         const prev = seam[i - 1];
 
-        if (compressed && val === prev) {
-          throw new Error('Error encoding seam -- unexpected straight seam detected');
+        if (forceDiagonals && val === prev) {
+          throw new Error(
+            'Error encoding seam -- unexpected straight seam detected'
+          );
         }
 
         let bits =
           val < prev
             ? [0] // there are only 3 possible values, so we can always encode one with a single bit
-            : val > prev ? (compressed ? [1] : [1, 0]) : compressed ? null : [1, 1];
+            : val > prev
+            ? forceDiagonals
+              ? [1]
+              : [1, 0]
+            : forceDiagonals
+            ? null
+            : [1, 1];
 
         for (let j = 0; j < bits.length; j++) {
           bits[j] && (byte |= 1 << bitNum);
@@ -851,8 +875,8 @@ class Generator {
       }
     });
 
-    return bytes.map(b => String.fromCharCode(b)).join('');
+    return bytes.map((b) => String.fromCharCode(b)).join('');
   }
 }
 
-module.exports = Generator;
+export default Generator;
