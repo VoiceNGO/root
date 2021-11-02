@@ -17,5 +17,8 @@ message File {
   optional string    md5hash  = 8;
 
   extensions 100 to max;
-  /* Utilized 101 */
+  /*
+  dimensions   = 100
+  videoDetails = 101
+  */
 }

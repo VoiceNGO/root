@@ -1,26 +1,27 @@
 /* eslint complexity: "off", max-statements: "off", no-param-reassign: "Off", no-multi-assign: "off", no-magic-numbers: "off", voice/curly-except-return: "off", class-methods-use-this: "off", max-params: "off", no-negated-condition: "off", prefer-destructuring: "off", max-nested-callbacks: "off", no-unused-expressions: "off", no-bitwise: "off" */
-
+import type { seam, pxMap, seamsDefinition } from '../seam.d';
 import { encode as intEncode } from 'vle-integers';
 import matrices from './matrices';
-import { imageData } from './get-image-data';
 
-/**
- * converts a stepped "sparse" arrays into a dense one, e.g.:
- *   [1, 3, 5, 3] -> [1, 2, 3, 4, 5, 4, 3]
- */
-function toDenseArray(sparseArray: number[], stepSize: number) {
-  return sparseArray
-    .map((val, ix, ary) =>
-      Array.from({ length: ix < ary.length - 1 ? stepSize : 1 }).map(
-        (a, aIx) => val + (val < ary[ix + 1] ? 1 : -1) * aIx
-      )
-    )
-    .flat();
-}
+// /**
+//  * converts a stepped "sparse" arrays into a dense one, e.g.:
+//  *   [1, 3, 5, 3] -> [1, 2, 3, 4, 5, 4, 3]
+//  */
+// function toDenseArray(sparseArray: number[], stepSize: number) {
+//   return sparseArray
+//     .map((val, ix) =>
+//       Array.from({ length: ix < sparseArray.length - 1 ? stepSize : 1 }).map(
+//         // @ts-expect-error -- TS doesn't understand array lengths very well
+//         (a, aIx) => val + (val < sparseArray[ix + 1] ? 1 : -1) * aIx
+//       )
+//     )
+//     .flat();
+// }
 
-function to2DDenseArray(seams: number[][], stepSize: number): number[][] {
-  return seams.map((seam) => toDenseArray(seam, stepSize));
-}
+// function toDenseSeamArray(seams: seam[], stepSize: number): seam[] {
+//   // eslint-disable-next-line @typescript-eslint/no-shadow -- false positive from imported type
+//   return seams.map((seam) => toDenseArray(seam, stepSize));
+// }
 
 function sumAdjoiningVals(
   ary: number[],
@@ -33,7 +34,7 @@ function sumAdjoiningVals(
 
   for (let i = aryIndex + direction; i >= 0 && i < aryLength; i += direction) {
     if (ary[i]) {
-      ttl += ary[i];
+      ttl += ary[i]!;
       count--;
 
       if (!count) {
@@ -80,17 +81,6 @@ function adjoiningValues(ary, aryLen, x) {
 
 function rightIsCloser(left: number, center: number, right: number): boolean {
   return left - center - center - right < 0;
-}
-
-function pxEnergy(
-  pxData: number[],
-  cols: number,
-  x: number,
-  y: number
-): number {
-  const ix = (y * cols + x) * 4;
-
-  return (pxData[ix]! + pxData[ix + 1]! + pxData[ix + 2]!) * pxData[ix + 3]!;
 }
 
 function recomputeEnergyAtPixel(
@@ -225,24 +215,21 @@ class Generator {
   direction: 'vertical' | 'horizontal' = 'vertical';
   maxSeams = Infinity;
   percentage = 0.5;
-  isDirty = false;
+  image!: ImageData;
+  imageData: Uint8ClampedArray;
+  imagePromise: Promise<void>;
 
   data!: number[];
-  // direction!: 'horizontal' | 'vertical';
   energyMap!: number[][];
   height!: number;
-  image!: imageData;
-  imgPromise: Promise<void>;
-  // mergeSize!: number;
-  // stepSize!: number;
   width!: number;
 
-  constructor(imgPromise: Promise<imageData>, options: generatorOptions = {}) {
+  constructor(imgPromise: Promise<ImageData>, options: generatorOptions = {}) {
     this.#setOptions(options);
 
-    this.imgPromise = imgPromise.then((img) => {
+    this.imagePromise = imgPromise.then((img) => {
       this.image = img;
-      this.data = img.data;
+      this.imageData = img.data;
     });
   }
 
@@ -251,7 +238,7 @@ class Generator {
    *   algorithms because we're now only working with seemingly horizontal seams :)
    */
   // async #setRotation(): Promise<void> {
-  //   await this.imgPromise;
+  //   await this.imagePromise;
 
   //   if (this.direction === 'vertical') {
   //     this.width = this.image.width;
@@ -261,75 +248,6 @@ class Generator {
   //     this.width = this.image.height;
   //   }
   // }
-
-  energyAtPixel(
-    x: number,
-    y: number,
-    pxData: number[],
-    rows: number,
-    cols: number
-  ): number {
-    const up = y;
-    const down = y < rows - 1;
-    const left = x;
-    const right = x < cols - 1;
-    let tmp;
-
-    let xSum = 0;
-    let ySum = 0;
-
-    left &&
-      ((xSum += -2 * pxEnergy(pxData, cols, x - 1, y)),
-      up &&
-        ((xSum += tmp = -1 * pxEnergy(pxData, cols, x - 1, y - 1)),
-        (ySum += tmp)),
-      down &&
-        ((xSum += -1 * (tmp = pxEnergy(pxData, cols, x - 1, y + 1))),
-        (ySum += tmp)));
-
-    right &&
-      ((xSum += 2 * pxEnergy(pxData, cols, x + 1, y)),
-      up &&
-        ((xSum += tmp = pxEnergy(pxData, cols, x + 1, y - 1)),
-        (ySum += -1 * tmp)),
-      down &&
-        ((xSum += tmp = pxEnergy(pxData, cols, x + 1, y + 1)), (ySum += tmp)));
-
-    up && (ySum += -2 * pxEnergy(pxData, cols, x, y - 1));
-    down && (ySum += +2 * pxEnergy(pxData, cols, x, y + 1));
-
-    // don't allow zero values because we take some shortcuts and assume that falsey values are undefined
-    return Math.sqrt(xSum * xSum + ySum * ySum) || 1e-10;
-  }
-
-  #generateEnergyMap() {
-    // woo-hoo, nothing to do!
-    if (!this.isDirty) {
-      return Promise.resolve();
-    }
-
-    const cols = this.width;
-    const rows = this.height;
-    const pxData = this.data;
-    const energyMap = (this.energyMap = new Array(rows));
-
-    return this.imgPromise.then(() => {
-      for (let y = 0; y < rows; y++) {
-        energyMap[y] = new Array(cols);
-
-        for (let x = 0; x < cols; x++) {
-          energyMap[y][x] = this.energyAtPixel(x, y, pxData, rows, cols);
-        }
-      }
-    });
-  }
-
-  /**
-   * Computes the energy at a given pixel, taking into account that the neighboring pixels might be NaN
-   */
-  #computeEnergyAtPixel(x: number, y: number): number {
-    return this.#gradientMagnitude(x, y);
-  }
 
   /**
    * Gets the cumulative (R+G+B) * A energy at a pixel normalized to 0..1
@@ -342,8 +260,10 @@ class Generator {
     const ix = (y * this.width + x) * 4;
 
     return (
-      ((this.data[ix + 0] + this.data[ix + 1] + this.data[ix + 2]) *
-        this.data[ix + 3]) /
+      ((this.imageData[ix + 0] +
+        this.imageData[ix + 1] +
+        this.imageData[ix + 2]) *
+        this.imageData[ix + 3]) /
       255 /
       255 /
       3
@@ -395,6 +315,7 @@ class Generator {
 
       let tmp = null;
 
+      // TODO: matricies were converted to 1D array.  This is now broken
       xSum +=
         (!(tmp = matrixX[row + 1]![0])
           ? 0
@@ -419,48 +340,6 @@ class Generator {
     }
 
     return Math.sqrt(xSum * xSum + ySum * ySum);
-  }
-
-  /**
-   * Computes the collected energy at a given pixel, taking into account that relevant pixels might be NaN
-   */
-  #computeCollectedEnergyAtPixel(x: number, y: number): number {
-    // if the pixel was removed from the energy map, ignore it
-    if (!this.energyMap[y][x]) {
-      return NaN;
-    }
-
-    if (!y) {
-      return this.energyMap[y][x];
-    }
-
-    const energyRow = this.energyMap[y];
-    const cols = this.width;
-    let center = x;
-    let left = x;
-    let right = x;
-
-    if (!energyRow[center]) {
-      if (energyRow[center - 1]) {
-        center--;
-        left--;
-      } else {
-        center++;
-        left++; // TODO: should this be right++?
-      }
-    }
-
-    const leftVal = sumAdjoiningVals(energyRow, left, 1, -1, cols);
-    const rightVal = sumAdjoiningVals(energyRow, right, 1, +1, cols);
-
-    return (
-      this.energyMap[y][x] +
-      Math.min(
-        leftVal || Infinity,
-        energyRow[center] || Infinity,
-        rightVal || Infinity
-      )
-    );
   }
 
   /**
@@ -494,22 +373,6 @@ class Generator {
     }
 
     return this;
-  }
-
-  /**
-   * Recalculates both the energy map and collected energy at a given pixel
-   */
-  recalcMapAt(x: number, y: number): boolean {
-    const energyAtPixel = this.#computeEnergyAtPixel(x, y);
-    this.energyMap[y][x] = energyAtPixel;
-
-    let collectedAtPixel = this.#computeCollectedEnergyAtPixel(y, x);
-
-    // true if data at pixel changed
-    return (
-      energyAtPixel === this.energyMap[y][x] &&
-      collectedAtPixel === this.collectedMap[y][x]
-    );
   }
 
   /**
@@ -577,7 +440,7 @@ class Generator {
           y,
           energyMap,
           collectedMap,
-          this.data,
+          this.imageData,
           height,
           width
         )
@@ -591,7 +454,7 @@ class Generator {
           y,
           energyMap,
           collectedMap,
-          this.data,
+          this.imageData,
           height,
           width
         )
@@ -601,7 +464,15 @@ class Generator {
 
       // recalculate all values that must propogate to the next row
       for (let x = minCol + 1; x < maxCol; x++) {
-        recalcMaps(x, y, energyMap, collectedMap, this.data, height, width);
+        recalcMaps(
+          x,
+          y,
+          energyMap,
+          collectedMap,
+          this.imageData,
+          height,
+          width
+        );
       }
     }
 
@@ -684,37 +555,30 @@ class Generator {
    * Generates seams for the given image.
    */
   async generateSeams(): Promise<void> {
-    // woo-hoo, nothing to do!
-    if (!this.isDirty) {
-      return;
-    }
-    if (!this.imgPromise) {
+    if (!this.imagePromise) {
       throw new Error('Must set an image before generating seams');
     }
 
-    await this.imgPromise;
+    await this.imagePromise;
 
-    this.#generateEnergyMap();
+    this.energyMap = this.#generateEnergyMap();
     this.#computeLowestSeamEnergies();
-    this.#generateSeams();
+    this.seams = this.#generateSeams();
   }
 
-  #generateSeams(): Promise<void> {
+  #generateSeams(): seam[] {
     const numSeams = Math.ceil(
       Math.min(this.seamLimit, (this.width / this.stepSize) * this.percentSeams)
     );
     const seams = new Array(numSeams);
 
     for (let i = 0; i < numSeams; i++) {
-      let seam = this.#createSeam();
+      const seam = this.#createSeam();
       seams[i] = seam;
-      // console.log(i, numSeams);
-      // console.log(seam.join(' '));
       this.#removeSeamFromEnergy(seam);
     }
 
-    this.seams = seams;
-    this.isDirty = false;
+    return seams;
   }
 
   /**
@@ -732,7 +596,7 @@ class Generator {
       const seams =
         allowSparse || this.stepSize === 1
           ? this.seams
-          : to2DDenseArray(seams, this.stepSize);
+          : toDenseSeamArray(seams, this.stepSize);
 
       return {
         width: this.width,
@@ -755,7 +619,6 @@ class Generator {
     this.#verifyStepSize(stepSize);
     this.#verifyMergeSize(mergeSize);
     this.#verifyMaxSeams(options, maxSeams);
-    this.#setDirtyIfOptionsChanged(options);
   }
 
   #verifyStepSize(stepSize?: number): void {
@@ -776,23 +639,8 @@ class Generator {
     }
   }
 
-  #setDirtyIfOptionsChanged(options: generatorOptions): void {
-    let key: keyof generatorOptions;
-    for (key in options) {
-      if (this[key] !== options[key]) {
-        this.#setDirty();
-      }
-    }
-  }
-
   #isVertical(): boolean {
     return this.direction === 'vertical';
-  }
-
-  #setDirty(): Generator {
-    this.isDirty = true;
-
-    return this;
   }
 
   async encode(): Promise<string> {
@@ -845,7 +693,7 @@ class Generator {
           );
         }
 
-        let bits =
+        const bits =
           val < prev
             ? [0] // there are only 3 possible values, so we can always encode one with a single bit
             : val > prev

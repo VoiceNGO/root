@@ -6073,7 +6073,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"memoized-decorator@workspace:src/modules/memoized-decorator":
+"memoized-decorator@>=0.0.5, memoized-decorator@workspace:src/modules/memoized-decorator":
   version: 0.0.0-use.local
   resolution: "memoized-decorator@workspace:src/modules/memoized-decorator"
   dependencies:
@@ -6761,7 +6761,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"path-resolve@1.0.1, path-resolve@workspace:src/modules/path-resolve":
+"path-resolve@npm:1.0.1":
+  version: 1.0.1
+  resolution: "path-resolve@npm:1.0.1"
+  dependencies:
+    expand-tilde: ^2.0.2
+  checksum: 3d61a0d11a9c391f859ead7f0b0731d9ff9dc1134593868583a96e20e2a5f406cbab82d101f7de5e73a18b139d0fe4fe176464b6bd7c813655438f18aa4913d2
+  languageName: node
+  linkType: hard
+
+"path-resolve@workspace:src/modules/path-resolve":
   version: 0.0.0-use.local
   resolution: "path-resolve@workspace:src/modules/path-resolve"
   dependencies:
@@ -7319,20 +7328,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"seams@workspace:src/tools/seams":
+"seams@workspace:src/modules/seams":
   version: 0.0.0-use.local
-  resolution: "seams@workspace:src/tools/seams"
+  resolution: "seams@workspace:src/modules/seams"
   dependencies:
     "@tensorflow/tfjs-node": ^3.9.0
     "@vladmandic/face-api": ^1.4.2
     canvas: ^2.8.0
     globby: ^12.0.2
+    memoized-decorator: ">=0.0.5"
     path-resolve: 1.0.1
+    timer-decorator: ">=0.0.6"
+    tslib: ^2.3.1
+    typescript: ^4.4.2
+    vle-integers: ">=0.0.4"
     yargs: ^17.1.1
   dependenciesMeta:
     "@tensorflow/tfjs-node":
       optional: true
     "@vladmandic/face-api":
+      optional: true
+    canvas:
       optional: true
   languageName: unknown
   linkType: soft
@@ -7970,7 +7986,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"timer-decorator@workspace:src/modules/timer-decorator":
+"timer-decorator@>=0.0.6, timer-decorator@workspace:src/modules/timer-decorator":
   version: 0.0.0-use.local
   resolution: "timer-decorator@workspace:src/modules/timer-decorator"
   languageName: unknown
@@ -8147,6 +8163,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "tslib@npm:2.3.1"
+  checksum: de17a98d4614481f7fcb5cd53ffc1aaf8654313be0291e1bfaee4b4bb31a20494b7d218ff2e15017883e8ea9626599b3b0e0229c18383ba9dce89da2adf15cb9
+  languageName: node
+  linkType: hard
+
 "tsutils@npm:^3.21.0":
   version: 3.21.0
   resolution: "tsutils@npm:3.21.0"
@@ -8239,11 +8262,11 @@ typescript@^4.4.2:
 
 "typescript@patch:typescript@^4.4.2#~builtin<compat/typescript>":
   version: 4.4.2
-  resolution: "typescript@patch:typescript@npm%3A4.4.2#~builtin<compat/typescript>::version=4.4.2&hash=d8b4e7"
+  resolution: "typescript@patch:typescript@npm%3A4.4.2#~builtin<compat/typescript>::version=4.4.2&hash=32657b"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 11d6ab6e868117908c388401e2ac06d503c5c8709115ab80ee69a1a6352c1f98471d1e595636bfe6a2d6b20b03a44df6bb2d3d198cea97c0c328968cd18d2b70
+  checksum: 3109ae25705746996007161cdd3271857db4f40356b894e34d4cabc216bf9e251f53e0bb6e48df2450b5e3fd948dcbee716a616a4ad4cf7251292025e6163cb1
   languageName: node
   linkType: hard
 
@@ -8383,9 +8406,12 @@ typescript@^4.4.2:
   languageName: node
   linkType: hard
 
-"vle-integers@workspace:src/modules/javascript-vle-integers":
+"vle-integers@>=0.0.4, vle-integers@workspace:src/modules/vle-integers":
   version: 0.0.0-use.local
-  resolution: "vle-integers@workspace:src/modules/javascript-vle-integers"
+  resolution: "vle-integers@workspace:src/modules/vle-integers"
+  dependencies:
+    "@tsconfig/node16": ^1.0.2
+    typescript: ^4.4.2
   languageName: unknown
   linkType: soft
 

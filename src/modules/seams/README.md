@@ -74,13 +74,18 @@ Generate seams in JS:
 ```ts
 import { Generator as SeamGenerator } from 'seams';
 
-const myImage = SeamGenerator(pathToImg, { options });
-myImage.encode().then(function (encodedString) {
-  // save encodedString or pass it to a renderer
-});
+async function generateSeam() {
+  const myImage = new SeamGenerator(pathToImage, { options });
+  const encodedSeams = await myImage.getEncodedSeams();
+  // save encodedData to a file somewhere
+
+  // or if you want to pass the data directly to a renderer in a browser (in general don't do this, it's slow):
+  const pixelMaps = await myImage.getPixelPriorityMaps();
+  const myImageRenderer = new SeamRender(pathToImage, pixelMaps, { options });
+}
 ```
 
-#### Options
+#### Generator Options
 
 Options to be passed to either the cli via `--option` or JS class instance via `{options}`. The default options create a balance of good looking seams and reasonably small seam files.
 
@@ -90,11 +95,18 @@ Options to be passed to either the cli via `--option` or JS class instance via `
 | forceDiagonals | <bool=true>           | Improves seam compression by disabling "straight" sections of a seam, meaning that a seam *must* move diagonally at every pixel. This usually does not create any noticable visual differences. Makes seams 40% smaller.
 | stepSize       | <number=2>            | Seams skip by N pixels allowing for significantly smaller, but less accurate seams. Makes seams N<sup>2</sup> times smaller (e.g. a value of 2 results in seams that are 1/4th the size).  2 is usually not very noticeable, values of 4+ start to cause a noticeable number of artifacts.
 | mergeSize      | <number=1>            | Remove N neighboring pixels from each seam instead of 1.  Creates seam files that are 1/Nth the size, but far less accurate<br /><br />This can negatively affect quality significantly more than the effect of `spacing`
-| direction      | <string=vertical>     | `vertical` \| `horizontal` \| `both`. Sets the direction of the seams to generate.  `vertical` means that the width of the image can be resized using seams and the height will be resized by normal scaling.  This is usually the desired mode
+| direction      | <string=vertical>     | `vertical` \| ~~`horizontal`~~ \| ~~`both`~~. Sets the direction of the seams to generate.  `vertical` means that the width of the image can be resized using seams and the height will be resized by normal scaling.  This is usually the desired mode
 | maxSeams       | <number=-1>           | Sets a limit on the maximum number of seams to create
 | percentage     | <number=0.5>          | Generate this % of seams. e.g with a value of `0.5`, a 1024x768 image could be scaled down to 512px using seam reduction.  Scaling down much below 50% of the original size usually starts to create ugly artifacts
 | maskImage      | <string=image source> | not yet implemented<br /><br />A grayscale mask image where lighter areas will be preserved as long as possible
 | faceDetection  | <bool=false>          | not yet implemented<br /><br />Automatically creates an image mask by detecting faces in the image.  If `maskImage` is passed this option is ignored
+
+#### Generator Methods
+
+| method                     | args | description                                           |
+| -------------------------- | ---- | ----------------------------------------------------- |
+| async getPixelPriorityMaps |      | Gets raw seam map to be passed directly to a renderer |
+| async getEncodedSeams      |      | Gets encoded seam data to be saved to a file          |
 
 ### Renderer
 
@@ -115,6 +127,8 @@ mySeam.setWidth(500);
 
 set via `{ option: value }` in either the constructor or via `mySeam.setOptions({ option: value })`
 
+Preparing the seam data is a computationally expensive operation.
+
 <!-- prettier-ignore -->
 | option             | args         | description |
 |:------------------ |:------------ |:----------- |
@@ -122,10 +136,11 @@ set via `{ option: value }` in either the constructor or via `mySeam.setOptions(
 | visibleSeams       | <bool=false> | Toggles visible seams.  Not available in minified build.
 | visibilityHeatMaps | <bool=false> | Showing heat maps instead of actual image data.  Not available in minified build.
 | autoResize         | <bool=false> | Resize the image whenever the window is resized to fit the *width* of the parent container.  If you need to resize based on events other than `window.onresize` you will need to use the `setWidth`, etc methods below
+| prepareImmediately | <bool=true>  | Prepare seam data as soon as it is provided
 
 #### Renderer methods
 
-| option              | args             | description                                                                                                                                            |
+| method              | args             | description                                                                                                                                            |
 | ------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | getRenderingNode    |                  | Returns the rendering node. 99.4% of the time (caniuse stats, Sept 2021) this is a Canvas. On very old browsers it just returns an image as a fallback |
 | setWidthAndHeight   | <number, number> | Resizes the image canvas to a given width and height. Internally re-scales using seam algorithm and/or traditional scaling. Ingores image ratio.       |
@@ -133,6 +148,7 @@ set via `{ option: value }` in either the constructor or via `mySeam.setOptions(
 | setHeight           | \<number\>       | Resize the image by setting its height. Width is automatically calculated based on the image ratio                                                     |
 | setOptions          | {options}        | Sets options. Existing options not passed are preserved                                                                                                |
 | removeResizeHandler |                  | Removes the window onresize event listener                                                                                                             |
+| prepare             |                  | Prepares seam data                                                                                                                                     |
 
 ### React Renderer
 
@@ -150,13 +166,14 @@ I wanted in-browser seam carving! I found a few other JS seam carving implementa
 
 This is an implementation of the [seam carving](https://en.wikipedia.org/wiki/Seam_carving) algorithm. The only real difference is that instead of calculating seams on the fly we pre-calculate them and provide this data to the browser in a compressed format.
 
-I tried several methods of calculating seams on the fly with moderately successful results, but "great" performance require them to be cached. The brief explanation is that for every seam removed we need to re-generate part of the image heat map and energy maps. This is a fairly expensive operation and my first attempt at optimizing it took about 50ms/seam on a 500x500px image on a modern MacBook Pro. I would need to get this down to ~1ms to make resizing without jitters possible (much faster if I wanted this to work with larger images) and I didn't think this possible, at least not in JS.
+I tried several methods of calculating seams on the fly with moderately successful results, but "great" performance seem to require them to be cached. The brief explanation is that for every seam removed we need to re-generate part of the image heat map and energy maps. This is a fairly expensive operation and my first attempt at optimizing it took about 50ms/seam on a 500x500px image on a modern MacBook Pro. I would need to get this down to ~1ms to make resizing without jitters possible (much faster to work with larger images) and I didn't think this possible, at least not in just JS. WebGL or WebAssembly may be options, though WebAssembly still needs a JS bridge to write to canvas, so WebGL looks like the better contender at the moment. It's conceptually straight-forward to offload the energy calculations into a pixel shader, for instance. Quick test shows that just calculating the best seam takes ~8ms in JS from a 500x500px energy map, so this may be a possible path.
 
 FWIW my most successful attempt was accomplished by ignoring everything above and basically guessing where the lowest energy seams were based on the net energy of an entire row/column. This worked fairly well until an important element ran up against the edge of the image at which point it would start to get cut up when the running seam was unable to go around it.
 
 ## To Do
 
-- Add support for horizontal seams
+- Add support for horizontal seams (easy)
+- Add support for vertical and horizontal seams at the same time (much harder)
 - Add ability to mask images
 - Add facial detection
 - Try other heat map algorithms (visual saliency in particular)

@@ -1,6 +1,11 @@
 /* eslint no-console: "off", max-statements: "off", class-methods-use-this: "off", no-bitwise: "off", no-magic-numbers: "off", no-implicit-coercion: "off", lines-between-class-members: "off", max-params: "off", no-duplicate-imports: "off" */
-import { read } from 'fs';
-import getImageData from './get-image-data';
+import getImageData from '../utils/get-image-data';
+import {
+  HORIZONTAL,
+  tPixelPriorityMaps,
+  VERTICAL,
+} from '../utils/seam-definition';
+import decodeSeams from './seam-decoder';
 
 const defaultOptions = {
   seamPriority: 1,
@@ -11,16 +16,6 @@ const defaultOptions = {
 };
 
 export type rendererOptions = typeof defaultOptions;
-
-type seam = number[];
-
-type seamsDefinition = {
-  width: number;
-  height: number;
-  isVertical: boolean;
-  mergeSize: number;
-  seams: seam[];
-};
 
 function wait(ms: number) {
   return new Promise((resolve) => {
@@ -43,9 +38,9 @@ class Renderer {
   #numVerticalSeams!: number;
   #options: rendererOptions = defaultOptions;
   #resizeHandler?: () => void;
-  #seamData: { horizontal?: seamsDefinition; vertical?: seamsDefinition } = {};
   #verticalSeamMap!: Int16Array;
   #width!: number;
+  #pxPriorityMaps!: tPixelPriorityMaps;
 
   /**
    * Creates a new Seam renderer
@@ -55,19 +50,21 @@ class Renderer {
    */
   constructor(
     imgSrc: string,
-    seamData: string | seamsDefinition,
+    seamData: string | tPixelPriorityMaps,
     options: Partial<rendererOptions>
   ) {
     // very old browsers just fallback to using an image
-    if (typedArraysAvailable) {
-      this.setOptions(options);
-      this.#createCanvas();
-      this.#loadImage(imgSrc);
-      this.#importSeamData(seamData);
-    } else {
+    if (!typedArraysAvailable) {
       this.#imageNode = new Image();
       this.#imageNode.src = imgSrc;
+
+      return;
     }
+
+    this.#loadImage(imgSrc);
+    this.setOptions(options);
+    this.#createCanvas();
+    this.#importSeamData(seamData);
   }
 
   setOptions(options: Partial<rendererOptions>): void {
@@ -83,162 +80,35 @@ class Renderer {
     this.#ctx = this.#canvas.getContext('2d')!; // FFS TS, `2d` is *always* supported
   }
 
-  #decodeSeamData(data: string): void {
-    const bytes = data.split('').map((char) => char.charCodeAt(0));
-
-    const stepSize = bytes[0] >> 4; // 4 bits
-    const mergeSize = ((bytes[0] >> 2) & 3) + 1; // 2 bits
-    const isVertical = !!(bytes[0] & 2); // 1 bit
-    const compressed = !!(bytes[0] & 1); // 1 bit
-
-    let decodeOffset = 1;
-    let byte = 0;
-    let bitOffset = 0;
-
-    function read2ByteNumber() {
-      const byte1 = bytes[decodeOffset++];
-      const byte2 = bytes[decodeOffset++];
-
-      return (byte1 << 8) + byte2;
-    }
-
-    function readBit() {
-      if (--bitOffset < 0) {
-        bitOffset = 7;
-        byte = bytes[decodeOffset];
-        decodeOffset++;
-      }
-
-      return byte & (1 << decodeOffset);
-    }
-
-    const width = read2ByteNumber();
-    const height = read2ByteNumber();
-    const numSeams = read2ByteNumber();
-
-    const seams: seam[] = [];
-    const numSeamSteps = Math.ceil((isVertical ? height : width) / stepSize);
-
-    // using x, y, and col here for my own sanity, but the seams are actually non-directional except for the `isVertical` flag
-    for (let seamNum = 0; seamNum < numSeams; seamNum++) {
-      let seamCol = read2ByteNumber();
-      const seam: seam = [seamCol];
-
-      // compressed mode:
-      //   0 = left  / down
-      //   1 = right / up
-      //
-      // uncompressed mode:
-      //   0  = left  / down
-      //   10 = straight
-      //   11 = right / up
-      for (let y = 1; y < numSeamSteps; y += stepSize) {
-        const dir = readBit() ? (compressed ? 1 : readBit() ? 1 : 0) : -1;
-
-        for (let x = 0; x < stepSize; x++) {
-          seam.push((seamCol += dir));
-        }
-      }
-
-      seams.push(seam);
-    }
-
-    if (isVertical) {
-      this.#generateVerticalSeamsMap(seams, width, height, mergeSize);
-    } else {
-      this.#generateHorizontalSeamsMap(seams, width, height, mergeSize);
-    }
-  }
-
-  #generateVerticalSeamsMap(
-    seams: seam[],
-    width: number,
-    height: number,
-    mergeSize: number
-  ): void {
-    const totalPixels = width * height;
-    const seamMap = new Int16Array(totalPixels);
-    seamMap.fill(0xffff);
-
-    seams.forEach((seam, priority) => {
-      for (let y = 0; y < height; y++) {
-        seam.forEach((x) => {
-          for (let i = 0; i < mergeSize; i++) {
-            seamMap[y * width + x + i] = priority;
-          }
-        });
-      }
-    });
-
-    this.#verticalSeamMap = seamMap;
-    this.#numVerticalSeams = seams.length;
-  }
-
-  #generateHorizontalSeamsMap(
-    seams: seam[],
-    width: number,
-    height: number,
-    mergeSize: number
-  ): void {
-    const totalPixels = width * height;
-    const seamMap = new Int16Array(totalPixels);
-    seamMap.fill(0xffff);
-
-    seams.forEach((seam, priority) => {
-      for (let x = 0; x < width; x++) {
-        seam.forEach((y) => {
-          for (let i = 0; i < mergeSize; i++) {
-            seamMap[y * width + x + i] = priority + 1;
-          }
-        });
-      }
-    });
-
-    this.#horizontalSeamMap = seamMap;
-    this.#numHorizontalSeams = seams.length;
-  }
-
   #validateSeamDataFormat(
-    seamData: seamsDefinition | string
-  ): seamData is seamsDefinition {
+    seamData: tPixelPriorityMaps | string
+  ): seamData is tPixelPriorityMaps {
     return (
-      {}.toString.call(seamData) === '[object Object]' &&
-      {}.hasOwnProperty.call(seamData, 'seams') &&
-      {}.hasOwnProperty.call(seamData, 'width') &&
-      {}.hasOwnProperty.call(seamData, 'height') &&
-      {}.hasOwnProperty.call(seamData, 'vertical') &&
-      {}.hasOwnProperty.call(seamData, 'stepSize')
+      ({}.toString.call(seamData) === '[object Object]' &&
+        {}.hasOwnProperty.call(seamData, VERTICAL)) ||
+      {}.hasOwnProperty.call(seamData, HORIZONTAL)
     );
   }
 
-  #importSeamData(seamData: string | seamsDefinition): void {
+  #importSeamData(seamData: string | tPixelPriorityMaps): void {
     const isSeamDataObject = this.#validateSeamDataFormat(seamData);
     const isSeamString = typeof seamData === 'string';
 
     if (isSeamDataObject) {
-      this.#setSeamData(seamData);
+      this.#pxPriorityMaps = seamData;
     } else if (isSeamString) {
-      this.#decodeSeamData(seamData);
+      this.#pxPriorityMaps = decodeSeams(seamData);
     } else {
       throw new Error('Unexpected seam data format');
     }
   }
 
-  #setSeamData(seamData: seamsDefinition): void {
-    const axis = seamData.isVertical ? 'vertical' : 'horizontal';
-
-    this.#seamData[axis] = seamData;
-  }
-
-  /**
-   * Gets the rendering node.  Append this to your DOM
-   */
   getRenderingNode(): HTMLElement {
     if (typedArraysAvailable) {
       return this.#canvas;
-    } else {
-      return this.#imageNode;
     }
+
+    return this.#imageNode;
   }
 
   #loadImage(imgSrc: string): void {
@@ -248,39 +118,31 @@ class Renderer {
     });
   }
 
-  #msg(
-    type: keyof typeof console,
-    prefix: string,
-    color: string,
-    msg: string
-  ): this {
-    // @ts-expect-error -- TS is being annoying
-    console[console[type] ? type : 'log'](
-      `%c${prefix} from seams:%c ${msg}`,
-      `background:${color};font-weight:bold`,
-      ''
-    );
-
-    return this;
-  }
-
   #warn(msg: string): void {
     if (this.#displayedWarnings.has(msg)) return;
-
     this.#displayedWarnings.add(msg);
-    this.#msg('warn', 'Warning', '#F5BD00', msg);
+
+    const logFn = console?.warn || console?.log;
+    if (!logFn) return;
+
+    logFn(
+      `%cWarning from seams:%c ${msg}`,
+      `background:#F5BD00;font-weight:bold`,
+      ''
+    );
   }
 
-  #carve(width: number, height: number): this {
+  #carve(width: number, height: number): void {
     this.#imagePromise.then(() => {
       const { seamPriority } = this.#options;
       const { width: sourceWidth, height: sourceHeight } = this.#imageData;
-      const seamData = this.#seamData;
 
       let targetCarvingWidth = width + (sourceWidth - width) * seamPriority;
       let targetCarvingHeight = height + (sourceHeight - height) * seamPriority;
-      const { vertical: verticalSeamData, horizontal: horizontalSeamData } =
-        seamData;
+      const {
+        vertical: verticalPriorityMap,
+        horizontal: horizontalPriorityMap,
+      } = this.#pxPriorityMaps;
       const numRemovedVerticalSeams = sourceWidth - targetCarvingWidth;
       const numRemovedHorizontalSeams = sourceHeight - targetCarvingHeight;
 
@@ -294,14 +156,14 @@ class Renderer {
         this.#warn('Scaling to > 100% height is not currently supported');
       }
 
-      if (!verticalSeamData && targetCarvingWidth !== sourceWidth) {
+      if (!verticalPriorityMap && targetCarvingWidth !== sourceWidth) {
         targetCarvingWidth = sourceWidth;
         this.#warn(
           'Attempting to re-scale width without providing vertical seam data'
         );
       }
 
-      if (!horizontalSeamData && targetCarvingHeight !== sourceHeight) {
+      if (!horizontalPriorityMap && targetCarvingHeight !== sourceHeight) {
         targetCarvingHeight = sourceHeight;
         this.#warn(
           'Attempting to re-scale height without providing horizontal seam data'
@@ -328,11 +190,7 @@ class Renderer {
         0,
         0
       );
-
-      return this;
     });
-
-    return this;
   }
 
   #carveImageData(
@@ -341,7 +199,6 @@ class Renderer {
     numRemoveVerticalSeams: number,
     numRemoveHorizontalSeams: number
   ): Uint8ClampedArray {
-    // eslint-disable-next-line -- false positive
     const imageData = this.#imageData.data;
     const verticalSeamMap = this.#verticalSeamMap;
     const horizontalSeamMap = this.#horizontalSeamMap;
@@ -369,10 +226,7 @@ class Renderer {
     return carvedImageData as Uint8ClampedArray;
   }
 
-  /**
-   * Resizes by re-scaling the canvas
-   */
-  #scale(width: number, height: number): this {
+  #scaleCanvas(width: number, height: number): this {
     this.#canvas.width = width;
     this.#canvas.height = height;
 
@@ -382,7 +236,8 @@ class Renderer {
   setWidthAndHeight(width: number, height: number): void {
     if (!typedArraysAvailable) return;
 
-    this.#carve(width, height).#scale(width, height);
+    this.#carve(width, height);
+    this.#scaleCanvas(width, height);
   }
 
   setWidth(width: number): void {
@@ -409,7 +264,7 @@ class Renderer {
   }
 
   async #onResize(): Promise<void> {
-    this.#scale(0, 0);
+    this.#scaleCanvas(0, 0);
     await wait(1);
 
     const {
