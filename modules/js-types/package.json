@@ -1,0 +1,7 @@
+{
+  "name": "@types/voice",
+  "version": "0.0.1",
+  "author": "Mark Kahn <m@voice.ngo>",
+  "private": true,
+  "types": "src/index.d.ts"
+}

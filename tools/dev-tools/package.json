@@ -1,0 +1,17 @@
+{
+  "name": "dev-tools",
+  "version": "0.0.1",
+  "description": "Voice Dev Tools",
+  "main": "build/index.js",
+  "author": "Mark Kahn <m-github@vouchr.com>",
+  "type": "module",
+  "dependencies": {
+    "fb-watchman": "^2.0.1",
+    "typescript": "next"
+  },
+  "devDependencies": {
+    "@types/fb-watchman": "^2.0.1",
+    "@types/voice": "workspace:*",
+    "node-build-tools": "workspace:*"
+  }
+}

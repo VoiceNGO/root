@@ -1,0 +1,36 @@
+{
+  "name": "vle-integers",
+  "version": "0.2.0",
+  "description": "Variable Length Encoded Integers",
+  "main": "build",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "yarn tsc"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "build/*"
+      ]
+    }
+  },
+  "repository": "git+ssh://git@github.com:VoiceNGO/javascript-vle-integers.git",
+  "keywords": [
+    "numbers",
+    "integers",
+    "variable",
+    "length",
+    "encoding",
+    "vle"
+  ],
+  "author": "Mark Kahn <m@vouchr.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VoiceNGO/javascript-vle-integers/issues"
+  },
+  "homepage": "https://github.com/VoiceNGO/javascript-vle-integers#readme",
+  "devDependencies": {
+    "@types/voice": "workspace:*",
+    "node-build-tools": "workspace:*"
+  }
+}

@@ -15,4 +15,9 @@ module.exports = {
     // 'source-map-support',
   ],
   sourceType: 'module',
+  env: {
+    test: {
+      plugins: ['@babel/plugin-transform-modules-commonjs'],
+    },
+  },
 };

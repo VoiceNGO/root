@@ -1,0 +1,16 @@
+{
+  "name": "schemas",
+  "version": "0.0.1",
+  "author": "Mark Kahn <m@voice.ngo>",
+  "private": true,
+  "scripts": {
+    "build-schemas": "./scripts/build-schemas.sh"
+  },
+  "exports": {
+    "./json-schemas/*": "./src/json-schemas/*.json",
+    "./json-types/*": "./src/json-types/*.d.ts"
+  },
+  "devDependencies": {
+    "json-schema-to-typescript": "^10.1.5"
+  }
+}

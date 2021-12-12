@@ -1,0 +1,36 @@
+{
+  "extends": "@tsconfig/node16/tsconfig.json",
+  "compileOnSave": true,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "composite": true,
+    "esModuleInterop": true,
+    "exactOptionalPropertyTypes": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "isolatedModules": true,
+    "module": "nodenext",
+    "moduleResolution": "Node",
+    "noEmit": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "paths": {
+      "@applications/*": ["src/applications/*"],
+      "@modules/*": ["src/modules/*"],
+      "package.json": ["package.json"]
+    },
+    "resolveJsonModule": true,
+    "rootDir": ".",
+    "strict": true,
+    "typeRoots": ["src/modules/@types", "node_modules/@types"]
+  },
+  "exclude": ["**/node_modules", "**/build", "**/dist"],
+
+  "//": "note: `./*` *only* includes files in the root directory, nothing below.  i.e. the same config files that are in `config`",
+  "include": ["src/**/*", "./*", "./*.json", "config/*", "config/*.json"]
+}

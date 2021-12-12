@@ -1,0 +1,25 @@
+{
+  "name": "js-utils",
+  "version": "0.0.1",
+  "author": "Mark Kahn <m@voice.ngo>",
+  "sideEffects": [
+    "*.se.ts"
+  ],
+  "type": "module",
+  "exports": {
+    "./*": "./build/*.js",
+    "./err": "./build/err/index.js",
+    "./err/*": "./build/err/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "build/*"
+      ]
+    }
+  },
+  "devDependencies": {
+    "@types/voice": "workspace:*",
+    "node-build-tools": "workspace:*"
+  }
+}

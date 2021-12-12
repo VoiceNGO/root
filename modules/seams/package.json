@@ -1,0 +1,54 @@
+{
+  "name": "seams",
+  "version": "0.0.4",
+  "description": "Fast pre-computed live in-browser seam carving",
+  "main": "build/app.js",
+  "scripts": {
+    "build": "npm run-script build-all-debug && npm run-script build-renderer-debug && npm run-script build-all-min && npm run-script build-renderer-min",
+    "build-all-debug": "browserify -t babelify -i canvas lib/index.js | babel | uglifyjs -d DEBUG=true -mc > build/index.debug.js",
+    "build-all-min": "browserify -t babelify -i canvas -i timer-decorator lib/index.js | babel | uglifyjs -d BUILD=false -mc > build/index.min.js",
+    "build-renderer-debug": "browserify -t babelify -i canvas lib/renderer.js | babel | uglifyjs -d DEBUG=true -mc > build/renderer.debug.js",
+    "build-renderer-min": "browserify -t babelify -i canvas -i timer-decorator lib/renderer.js | babel | uglifyjs -d BUILD=false -mc > build/renderer.min.js"
+  },
+  "repository": "git+ssh://git@github.com:VoiceNGO/seamed.git",
+  "keywords": [
+    "seamed",
+    "seams",
+    "image",
+    "scaling",
+    "seam",
+    "carving",
+    "content",
+    "aware"
+  ],
+  "author": "Mark Kahn <m@vouchr.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/voicengo/seamed/issues"
+  },
+  "homepage": "https://github.com/voicengo/seamed#readme",
+  "dependencies": {
+    "globby": "^12.0.2",
+    "memoized-decorator": "workspace:*",
+    "timer-decorator": "workspace:*",
+    "vle-integers": "workspace:*",
+    "yargs": "^17.1.1"
+  },
+  "devDependencies": {
+    "@types/voice": "workspace:*",
+    "node-build-tools": "workspace:*"
+  },
+  "optionalDependencies": {
+    "@tensorflow/tfjs-node": "^3.9.0",
+    "@vladmandic/face-api": "^1.4.2",
+    "canvas": "^2.8.0"
+  },
+  "aptDependencies": [
+    "build-essential",
+    "libcairo2-dev",
+    "libpango1.0-dev",
+    "libjpeg-dev",
+    "libgif-dev",
+    "librsvg2-dev"
+  ]
+}

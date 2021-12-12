@@ -1,0 +1,22 @@
+{
+  "name": "node-incoming",
+  "version": "0.0.2",
+  "description": "Incoming argument parser",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "build/*"
+      ]
+    }
+  },
+  "author": "Mark Kahn <m@vouchr.com>",
+  "devDependencies": {
+    "@types/voice": "workspace:*",
+    "node-build-tools": "workspace:*"
+  }
+}

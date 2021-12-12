@@ -30,7 +30,6 @@
     "@typescript-eslint/switch-exhaustiveness-check": "error",
     "array-callback-return": "error",
     "camelcase": "error",
-    "class-methods-use-this": "error",
     "complexity": ["error", 20],
     "default-case-last": "error",
     "dot-notation": "error",
@@ -47,7 +46,13 @@
     "max-depth": ["error", 4],
     "max-len": [
       "error",
-      { "code": 120, "ignoreUrls": true, "ignoreComments": true }
+      {
+        "code": 120,
+        "ignoreUrls": true,
+        "ignoreComments": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
     ],
     "max-nested-callbacks": ["error", { "max": 2 }],
     "max-params": ["error", 5],
@@ -62,7 +67,6 @@
     "no-constant-condition": ["error", { "checkLoops": false }],
     "no-constructor-return": "error",
     "no-duplicate-imports": "error",
-    "no-else-return": "error",
     "no-empty": ["error", { "allowEmptyCatch": true }],
     "no-extend-native": "error",
     "no-extra-bind": "error",

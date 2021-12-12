@@ -1,0 +1,13 @@
+{
+  "name": "graphql-definitions",
+  "version": "0.0.1",
+  "author": "Mark Kahn <m@voice.ngo>",
+  "private": true,
+  "sideEffects": [
+    "*.se.ts"
+  ],
+  "devDependencies": {
+    "@types/voice": "workspace:*",
+    "node-build-tools": "workspace:*"
+  }
+}

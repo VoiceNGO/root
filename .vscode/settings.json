@@ -1,19 +1,32 @@
 {
   "search.exclude": {
-    "**/dist/*": true,
     "**/build/*": true
   },
   "files.exclude": {
-    "**/*.codegen.*": true,
-    ".*": true,
-    "package.json": true,
-    "*.config.*": true,
-    "tsconfig.*": true,
-    "yarn.lock": true,
-    "config/**/*": false,
-    ".yarn/*": true
+    // paths to hide everywhere in the repo
+    "**/build": true,
+    "**/node_modules": true,
+
+    // Hide all top-level files (all config files)
+    "*.*": true,
+    "Vagrantfile": true,
+
+    // nested config files
+    "applications/*/*.*": true,
+    "misc/*/*.*": true,
+    "modules/*/*.*": true,
+    "tools/*/*.*": true,
+
+    // show all config files in all config folders
+    "**/config/**/*": false,
+    "**/README.md": false
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.packageManager": "yarn",
-  "eslint.validate": ["javascript", "typescript"]
+  "eslint.validate": ["javascript", "typescript"],
+  "testExplorer.useNativeTesting": true,
+  "files.watcherExclude": {
+    "**/.yarn/*": true,
+    "**/build/**": true
+  }
 }

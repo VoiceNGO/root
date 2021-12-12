@@ -1,0 +1,38 @@
+{
+  "name": "node-utils",
+  "version": "0.0.1",
+  "author": "Mark Kahn <m@voice.ngo>",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./build/index.js",
+    "./*": "./build/*.js",
+    "./child_process/promises": "./build/child_process/promises/index.js",
+    "./child_process/promises/*": "./build/child_process/promises/*.js",
+    "./fn": "./build/fn/index.js",
+    "./fn/*": "./build/fn/*",
+    "./fs": "./build/fs/index.js",
+    "./fs/*": "./build/fs/*"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "build/*"
+      ]
+    }
+  },
+  "sideEffects": [
+    "*.se.ts"
+  ],
+  "dependencies": {
+    "js-utils": "workspace:*",
+    "winston": "^3.3.3",
+    "winston-syslog": "^2.4.4"
+  },
+  "devDependencies": {
+    "@types/voice": "workspace:*",
+    "@types/winston-syslog": "^2.4.0",
+    "node-build-tools": "workspace:*",
+    "schemas": "workspace:*"
+  }
+}

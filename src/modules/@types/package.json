@@ -1,9 +1,0 @@
-{
-  "name": "voice-module-typescript-types",
-  "version": "0.0.1",
-  "author": "Mark Kahn <m@voice.ngo>",
-  "private": true,
-  "sideEffects": [
-    "*.se.ts"
-  ]
-}
