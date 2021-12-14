@@ -1,5 +1,12 @@
 import { levels } from './levels.js';
 
+function hasOwnProperty<X extends {}, Y extends PropertyKey>(
+  obj: X,
+  prop: Y
+): obj is X & Record<Y, unknown> {
+  return obj.hasOwnProperty(prop);
+}
+
 export default class Err extends Error {
   logLevel?: levels;
   static Fatal: typeof Err;
@@ -10,11 +17,8 @@ export default class Err extends Error {
     return `${err.toString()}\t${err.stack || ''}`;
   };
 
-  constructor(msg?: unknown, previousError?: unknown, logLevel?: levels) {
-    const msgIsValidType =
-      typeof msg === 'string' ||
-      (typeof msg === 'object' && msg?.constructor === Error);
-    super(msgIsValidType ? msg : undefined);
+  constructor(msg?: Obj, previousError?: unknown, logLevel?: levels) {
+    super(hasOwnProperty(msg, 'message') ? msg.message : msg);
 
     Error.captureStackTrace(this, this.constructor);
     this.name = this.constructor.name;

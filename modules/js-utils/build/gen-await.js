@@ -1,32 +1,39 @@
-import Err from './err/index.js';
-export async function gen(promise) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.genAllNull = exports.genAllEnforce = exports.genAll = exports.genNull = exports.genEnforce = exports.gen = void 0;
+const tslib_1 = require("tslib");
+const index_js_1 = (0, tslib_1.__importDefault)(require("./err/index.js"));
+async function gen(promise) {
     try {
         return [null, await promise];
     }
     catch (err) {
-        const error = err instanceof Err ? err : new Err(err);
+        const error = err instanceof index_js_1.default ? err : new index_js_1.default(err);
         return [error, null];
     }
 }
-export async function genEnforce(promise) {
+exports.gen = gen;
+async function genEnforce(promise) {
     let retVal;
     try {
         retVal = await promise;
     }
     catch (err) {
-        throw new Err(`promise threw '${err}' to genEnforce`, err);
+        throw new index_js_1.default(`promise threw '${err}' to genEnforce`, err);
     }
     if (retVal == null) {
-        throw new Err('promise did not return a value to genEnforce');
+        throw new index_js_1.default('promise did not return a value to genEnforce');
     }
     return retVal;
 }
-export function genNull(promise) {
+exports.genEnforce = genEnforce;
+function genNull(promise) {
     return Promise.resolve(promise)
         .then((v) => (v == null ? null : v))
         .catch(() => null);
 }
-export async function genAll(...promises) {
+exports.genNull = genNull;
+async function genAll(...promises) {
     const results = await Promise.all([].map.call(promises, gen));
     // @ts-ignore
     const errors = results.map((result) => result[0]);
@@ -35,11 +42,14 @@ export async function genAll(...promises) {
     // @ts-ignore
     return [errors.filter((v) => v != null).length ? errors : null, values];
 }
-export function genAllEnforce(...promises) {
+exports.genAll = genAll;
+function genAllEnforce(...promises) {
     // @ts-ignore
     return Promise.all([].map.call(promises, genEnforce));
 }
-export function genAllNull(...promises) {
+exports.genAllEnforce = genAllEnforce;
+function genAllNull(...promises) {
     // @ts-ignore
     return Promise.all([].map.call(promises, genNull));
 }
+exports.genAllNull = genAllNull;

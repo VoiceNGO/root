@@ -1,36 +1,40 @@
-import { unlink } from 'fs/promises';
-import { extname } from 'path';
-import isFrontendTS from './build-utils/is-frontend-ts.js';
-import isServiceDefinition from './build-utils/is-service-definition.js';
-import { getBuildFiles as getServiceBuildFiles } from './file-builders/ts-service-build.js';
-import { getBuildFiles as getStylBuildFiles } from './file-builders/styl-build.js';
-import { SupportedExtensions } from './build-utils/supported-extensions.js';
-import { getBuildFiles as getTSBuildFiles } from './file-builders/ts-build.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+const promises_1 = require("fs/promises");
+const path_1 = require("path");
+const is_frontend_ts_js_1 = (0, tslib_1.__importDefault)(require("./build-utils/is-frontend-ts.js"));
+const is_service_definition_js_1 = (0, tslib_1.__importDefault)(require("./build-utils/is-service-definition.js"));
+const ts_service_build_js_1 = require("./file-builders/ts-service-build.js");
+const styl_build_js_1 = require("./file-builders/styl-build.js");
+const supported_extensions_js_1 = require("./build-utils/supported-extensions.js");
+const ts_build_js_1 = require("./file-builders/ts-build.js");
 async function getFilesToDelete(srcPath, ext) {
     switch (ext) {
-        case SupportedExtensions.styl:
-            return getStylBuildFiles(srcPath);
-        case SupportedExtensions.ts:
-        case SupportedExtensions.tsx:
-            if (isFrontendTS(srcPath)) {
+        case supported_extensions_js_1.SupportedExtensions.styl:
+            return (0, styl_build_js_1.getBuildFiles)(srcPath);
+        case supported_extensions_js_1.SupportedExtensions.ts:
+        case supported_extensions_js_1.SupportedExtensions.tsx:
+            if ((0, is_frontend_ts_js_1.default)(srcPath)) {
                 throw new Error('Not Yet Implemented');
             }
             else {
-                if (await isServiceDefinition(srcPath)) {
-                    return getServiceBuildFiles(srcPath);
+                if (await (0, is_service_definition_js_1.default)(srcPath)) {
+                    return (0, ts_service_build_js_1.getBuildFiles)(srcPath);
                 }
                 else {
-                    return getTSBuildFiles(srcPath);
+                    return (0, ts_build_js_1.getBuildFiles)(srcPath);
                 }
             }
     }
 }
-export default async function deletedFile(srcPath) {
-    const ext = extname(srcPath);
-    let filesToDelete = ext in SupportedExtensions
+async function deletedFile(srcPath) {
+    const ext = (0, path_1.extname)(srcPath);
+    let filesToDelete = ext in supported_extensions_js_1.SupportedExtensions
         ? await getFilesToDelete(srcPath, ext)
         : [];
-    const deletePromises = filesToDelete.map(unlink);
+    const deletePromises = filesToDelete.map(promises_1.unlink);
     return Promise.all(deletePromises);
 }
+exports.default = deletedFile;
 console.log(42);

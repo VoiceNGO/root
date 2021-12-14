@@ -14,7 +14,7 @@ export async function gen<T>(
   try {
     return [null, await promise];
   } catch (err) {
-    const error: Err = err instanceof Err ? err : new Err(err);
+    const error = err instanceof Err ? err : new Err(err);
 
     return [error, null];
   }

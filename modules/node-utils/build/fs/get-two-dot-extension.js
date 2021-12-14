@@ -1,4 +1,6 @@
-export default function getTwoDotExtension(srcFile) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function getTwoDotExtension(srcFile) {
     const splitSrc = srcFile.split('.');
     if (splitSrc.length < 2)
         return '';
@@ -11,3 +13,4 @@ export default function getTwoDotExtension(srcFile) {
     }
     return lastOne;
 }
+exports.default = getTwoDotExtension;

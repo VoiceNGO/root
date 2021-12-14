@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "author": "Mark Kahn <m@voice.ngo>",
   "private": true,
-  "type": "module",
   "exports": {
     "./*": "./build/*.js",
     "./build-utils/*": "./build/build-utils/*.js",
@@ -20,18 +19,17 @@
     "*.se.ts"
   ],
   "bin": {
-    "jest": "./bin/jest.js",
-    "tsc": "./bin/tsc.js"
+    "build": "./bin/build.cjs",
+    "jest": "./bin/test.cjs",
+    "test": "./bin/test.cjs",
+    "tsc": "./bin/build.cjs"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.0",
-    "@babel/plugin-transform-modules-commonjs": "^7.16.0",
-    "@babel/preset-env": "^7.16.4",
-    "@babel/preset-typescript": "^7.16.0",
     "@types/voice": "workspace:*",
-    "babel-jest": "^27.4.2",
     "enhanced-resolve": "^5.8.3",
-    "jest": "^27.4.3",
     "typescript": "next"
+  },
+  "dependencies": {
+    "jest": "^27.4.4"
   }
 }

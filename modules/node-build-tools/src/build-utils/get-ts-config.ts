@@ -4,8 +4,6 @@ import { CompilerOptions } from 'typescript';
 import { dirname } from 'node-utils/dirname';
 import type { JSONSchemaForTheTypeScriptCompilerSConfigurationFile } from '@types/voice/src/json-types/tsconfig';
 
-const __dirname = dirname(import.meta);
-
 export default async function getTSConfig(
   srcFile: absoluteFilePath
 ): Promise<JSONSchemaForTheTypeScriptCompilerSConfigurationFile> {

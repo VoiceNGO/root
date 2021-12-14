@@ -1,3 +1,5 @@
+import Err from '../err/index.js';
+
 import expect from 'expect';
 import {
   gen,
@@ -19,7 +21,7 @@ const passWithTimeout = (timeout = 100) =>
   });
 
 test('gen catches errors', async () => {
-  expect(await gen(fail())).toEqual([new Error('42'), null]);
+  expect(await gen(fail())).toEqual([new Err('42'), null]);
 });
 
 test('gen passes through values', async () => {
@@ -38,7 +40,7 @@ test('genNull swallows errors and returns null', async () => {
   expect(
     await genNull(
       Promise.resolve().then(() => {
-        throw new Error('42');
+        throw new Err('42');
       })
     )
   ).toBe(null);
@@ -50,7 +52,7 @@ test('genEnforce resolves', async () => {
 
 test('genEnforce rejects null values', async () => {
   await expect(genEnforce(passNull())).rejects.toEqual(
-    new Error('promise did not return a value to genEnforce')
+    new Err('promise did not return a value to genEnforce')
   );
 });
 
@@ -60,14 +62,14 @@ test('genAll passes through successful values', async () => {
 
 test('genAll catches an array of errors', async () => {
   expect(await genAll(fail(), fail2())).toEqual([
-    [new Error('42'), new Error('43')],
+    [new Err('42'), new Err('43')],
     [null, null],
   ]);
 });
 
 test('genAll passes through mixed pass/fail values', async () => {
   expect(await genAll(pass(), fail(), pass2(), fail2())).toEqual([
-    [null, new Error('42'), null, new Error('43')],
+    [null, new Err('42'), null, new Err('43')],
     [42, null, 43, null],
   ]);
 });
@@ -95,10 +97,10 @@ test('genAllEnforce passes through an array of non-null values', async () => {
 
 test('genAllEnforce rejects all promises if any throw or do not return a value', async () => {
   await expect(genAllEnforce(pass(), fail())).rejects.toEqual(
-    new Error(`promise threw '42' to genEnforce`)
+    new Err(`promise threw '42' to genEnforce`)
   );
   await expect(genAllEnforce(pass(), passNull())).rejects.toEqual(
-    new Error('promise did not return a value to genEnforce')
+    new Err('promise did not return a value to genEnforce')
   );
 });
 

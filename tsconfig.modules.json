@@ -7,5 +7,5 @@
     "rootDir": "src"
   },
   "include": ["src/**/*"],
-  "exclude": ["**/__tests__/**/*", "./build/**/*"]
+  "exclude": ["**/_tests__/**/*", "./build/**/*"]
 }

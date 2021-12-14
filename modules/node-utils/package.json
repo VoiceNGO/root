@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "author": "Mark Kahn <m@voice.ngo>",
   "private": true,
-  "type": "module",
   "exports": {
     ".": "./build/index.js",
     "./*": "./build/*.js",

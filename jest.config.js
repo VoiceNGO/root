@@ -10,8 +10,11 @@ module.exports = {
   // rootDir: '/voice',
   // resolver: 'node-build-tools/build/jest-module-resolver.cjs',
   testPathIgnorePatterns: ['/node_modules/', 'test.d.ts'],
-  testRegex: ['(/__tests__/(?!_).*|(\\.|/)(test|spec))\\.[jt]sx?$'],
-  transform: {
-    '^.+\\.[cm]?tsx?$': 'babel-jest',
-  },
+  /*
+  TODO: tests are currently running against test in build instead of src because jest is *slooowwwww* compiling TS and
+        I can't figure out how to make it faster.  Running tests directly against the TS would be better
+  */
+  testRegex: [
+    '/build(?=/)(?!.*/src/).*(/__tests__/(?!_).*|(\\.|/)(test|spec))\\.[jt]sx?$',
+  ],
 };

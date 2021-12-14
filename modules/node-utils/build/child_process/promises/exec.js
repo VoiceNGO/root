@@ -1,9 +1,11 @@
-import { exec as cpExec } from 'child_process';
-import { promisify } from 'util';
-promisify;
-export default async function exec(command, options) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const child_process_1 = require("child_process");
+const util_1 = require("util");
+util_1.promisify;
+async function exec(command, options) {
     return new Promise((resolve, reject) => {
-        cpExec(command, options, (err, stdout, stderr) => {
+        (0, child_process_1.exec)(command, options, (err, stdout, stderr) => {
             if (err) {
                 return reject(err);
             }
@@ -11,3 +13,4 @@ export default async function exec(command, options) {
         });
     });
 }
+exports.default = exec;

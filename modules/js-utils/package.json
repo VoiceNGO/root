@@ -5,7 +5,6 @@
   "sideEffects": [
     "*.se.ts"
   ],
-  "type": "module",
   "exports": {
     "./*": "./build/*.js",
     "./err": "./build/err/index.js",

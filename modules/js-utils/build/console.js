@@ -1,4 +1,6 @@
-export default function getConsole() {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function getConsole() {
     if (typeof console !== 'undefined') {
         return console;
     }
@@ -30,3 +32,4 @@ export default function getConsole() {
         timeStamp: voidFn,
     };
 }
+exports.default = getConsole;

@@ -1,10 +1,11 @@
-import { exec } from 'node-utils/child_process/promises';
-import path from 'path';
-import { dirname } from 'node-utils/dirname';
-const __dirname = dirname(import.meta);
-export default async function getTSConfig(srcFile) {
-    const cwd = path.dirname(srcFile);
-    const { stdout, stderr } = await exec('yarn tsc --showConfig', { cwd });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+const promises_1 = require("node-utils/child_process/promises");
+const path_1 = (0, tslib_1.__importDefault)(require("path"));
+async function getTSConfig(srcFile) {
+    const cwd = path_1.default.dirname(srcFile);
+    const { stdout, stderr } = await (0, promises_1.exec)('yarn tsc --showConfig', { cwd });
     if (stderr) {
         return {};
     }
@@ -15,3 +16,4 @@ export default async function getTSConfig(srcFile) {
         throw new Error(`Error parsing JSON for tsc output in ${cwd}`);
     }
 }
+exports.default = getTSConfig;

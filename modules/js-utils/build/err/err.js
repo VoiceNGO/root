@@ -1,8 +1,8 @@
-export default class Err extends Error {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class Err extends Error {
     constructor(msg, previousError, logLevel) {
-        const msgIsValidType = typeof msg === 'string' ||
-            (typeof msg === 'object' && msg?.constructor === Error);
-        super(msgIsValidType ? msg : undefined);
+        super(msg?.message || msg);
         Error.captureStackTrace(this, this.constructor);
         this.name = this.constructor.name;
         if (previousError instanceof Error) {
@@ -13,6 +13,7 @@ export default class Err extends Error {
         }
     }
 }
+exports.default = Err;
 Err.printable = (err) => {
     if (!err)
         return '';

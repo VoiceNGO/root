@@ -1,5 +1,8 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.K8sServiceToPortNumber = void 0;
 /* eslint-disable no-magic-numbers */
-export function K8sServiceToPortNumber(service) {
+function K8sServiceToPortNumber(service) {
     switch (service) {
         case 'HTTP':
             return 80;
@@ -11,3 +14,4 @@ export function K8sServiceToPortNumber(service) {
             return 6379;
     }
 }
+exports.K8sServiceToPortNumber = K8sServiceToPortNumber;

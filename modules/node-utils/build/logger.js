@@ -1,10 +1,16 @@
-import path from 'path';
-import winston from 'winston';
-import 'winston-syslog';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.fork = void 0;
+const path_1 = __importDefault(require("path"));
+const winston_1 = __importDefault(require("winston"));
+require("winston-syslog");
 // import readJsonFile from './fs/read-json-file';
 const { createLogger, format: { colorize: colorizeFormat, combine: combineFormats, json: jsonFormat, simple: simpleFormat, timestamp: timestampFormat, }, transports: { File: FileTransport, Console: ConsoleTransport, 
 // @ts-expect-error -- Syslog is added by the 'winston-syslog' import above
-SysLog: SyslogTransport, }, } = winston;
+SysLog: SyslogTransport, }, } = winston_1.default;
 // TODO: fix once TS's nodenext option allows top level await
 // see: https://github.com/microsoft/TypeScript/issues/46869
 //
@@ -24,7 +30,7 @@ function getTestLogger() {
     return createLogger({});
 }
 function getFileTransport(filename, level = DEFAULT_LOG_LEVEL) {
-    const absoluteFilePath = path.resolve(LOG_FOLDER, filename);
+    const absoluteFilePath = path_1.default.resolve(LOG_FOLDER, filename);
     return new FileTransport({
         filename: absoluteFilePath,
         level,
@@ -40,7 +46,7 @@ function getLogger() {
     const rejectionsTransport = getFileTransport('rejections.log');
     return createLogger({
         defaultMeta: { ...getDefaultMeta(DEFAULT_NAMESPACE) },
-        levels: winston.config.syslog.levels,
+        levels: winston_1.default.config.syslog.levels,
         format: combineFormats(timestampFormat(), jsonFormat()),
         transports: [consoleTransport, errorTransport],
         exceptionHandlers: [exceptionsTransport],
@@ -56,5 +62,4 @@ function fork(namespace, options) {
         ...restOptions,
     });
 }
-// export default logger;
-export { fork };
+exports.fork = fork;
