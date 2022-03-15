@@ -13,3 +13,4 @@ export declare function genAll<T extends any[]>(...promises: T): Promise<[Array<
 export declare function genAllEnforce<T extends any[]>(...promises: T): Promise<UnpackAll<T>>;
 export declare function genAllNull<T extends any[]>(...promises: T): Promise<UnpackAllOrNull<T>>;
 export {};
+//# sourceMappingURL=gen-await.d.ts.map

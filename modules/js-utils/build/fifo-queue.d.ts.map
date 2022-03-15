@@ -1,0 +1,1 @@
+{"version":3,"file":"fifo-queue.d.ts","sourceRoot":"","sources":["../src/fifo-queue.ts"],"names":[],"mappings":"AAEA,MAAM,CAAC,OAAO,OAAO,SAAS,CAAC,CAAC;IAC9B,OAAO,CAAC,IAAI,CAA2B;IACvC,OAAO,CAAC,IAAI,CAA2B;IACvC,OAAO,CAAC,GAAG,CAAK;IAEhB,IAAI,MAAM,WAET;IAED,IAAI,CAAC,IAAI,EAAE,CAAC;IAcZ,IAAI,IAAI,CAAC,GAAG,IAAI;CAgBjB"}

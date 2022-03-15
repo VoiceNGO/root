@@ -1,4 +1,3 @@
-import expect from 'expect';
 import * as arrayAsync from '../array-async';
 import Err from '../err';
 

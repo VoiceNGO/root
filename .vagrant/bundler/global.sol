@@ -1,1 +1,1 @@
-{"dependencies":[["racc",["~> 1.4"]],["nokogiri",[">= 0"]],["vagrant-parallels",["= 2.2.4"]]],"checksum":"bc7b36a790f456a1dcc0bb34edb867269f585768879ae91c92d65d08f835201d","vagrant_version":"2.2.18"}
+{"dependencies":[["vagrant-notify-forwarder",["= 0.5.0"]],["racc",["~> 1.4"]],["nokogiri",[">= 0"]],["vagrant-parallels",["= 2.2.4"]]],"checksum":"2826a2703b27e5f96a407d870a4fe9b00b91cb5746a7350a64cf34c8b3eff24e","vagrant_version":"2.2.18"}

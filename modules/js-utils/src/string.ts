@@ -41,7 +41,7 @@ export function toPascalCase<T extends string>(src: T): T {
     .replace(/^([a-z])/, (m0, m1) => m1.toUpperCase()) as T;
 }
 
-export function toDashedCase<T extends string>(src: T): T {
+export function toKebabCase<T extends string>(src: T): T {
   return src
     .replace(/^([A-Z])/, (m0, m1) => m1.toLowerCase())
     .replace(/([A-Z])/g, (m0, m1) => `-${m1.toLowerCase()}`) as T;

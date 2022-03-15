@@ -2,10 +2,7 @@ import isServiceDefinition from '../build-utils/is-service-definition';
 import * as serviceBuilder from './ts-service-build.js';
 import * as tsBuilder from './ts-normal-build.js';
 
-enum TSTypes {
-  NORMAL,
-  SERVICE_DEFINITION,
-}
+import TSTypes from '../enums/ts-types';
 
 async function getTSType(srcPath: absoluteFilePath): Promise<TSTypes> {
   const isService = await isServiceDefinition(srcPath);
@@ -25,7 +22,9 @@ async function getBuilder(srcPath: absoluteFilePath) {
   }[tsType];
 }
 
-export async function buildFile(srcPath: absoluteFilePath) {
+export async function buildFile(
+  srcPath: absoluteFilePath
+): Promise<Record<absoluteFilePath, Buffer | string>> {
   const builder = await getBuilder(srcPath);
 
   return builder.buildFile(srcPath);

@@ -3,7 +3,8 @@ import type { JSONSchemaForNPMPackageJsonFiles } from 'schemas/json-types/packag
 import type { JSONSchemaForESLintConfigurationFiles } from 'schemas/json-types/eslintrc';
 import type { SchemaForPrettierrc } from 'schemas/json-types/prettierrc';
 import type { JSONSchemaForTheTypeScriptCompilerSConfigurationFile } from 'schemas/json-types/tsconfig';
-export default function readJsonFile(srcPath: absoluteFilePath, type: 'package.json'): Promise<JSONSchemaForNPMPackageJsonFiles>;
-export default function readJsonFile(srcPath: absoluteFilePath, type: 'eslintrc.json'): Promise<JSONSchemaForESLintConfigurationFiles>;
-export default function readJsonFile(srcPath: absoluteFilePath, type: 'prettierrc.json'): Promise<SchemaForPrettierrc>;
-export default function readJsonFile(srcPath: absoluteFilePath, type: 'tsconfig.json'): Promise<JSONSchemaForTheTypeScriptCompilerSConfigurationFile>;
+export default function readJsonFile(srcFolder: absoluteDirPath, fileName: 'package.json'): Promise<JSONSchemaForNPMPackageJsonFiles>;
+export default function readJsonFile(srcFolder: absoluteDirPath, fileName: 'eslintrc.json'): Promise<JSONSchemaForESLintConfigurationFiles>;
+export default function readJsonFile(srcFolder: absoluteDirPath, fileName: 'prettierrc.json'): Promise<SchemaForPrettierrc>;
+export default function readJsonFile(srcFolder: absoluteDirPath, fileName: 'tsconfig.json'): Promise<JSONSchemaForTheTypeScriptCompilerSConfigurationFile>;
+//# sourceMappingURL=read-json-file.d.ts.map

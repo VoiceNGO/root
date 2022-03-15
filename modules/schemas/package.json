@@ -10,6 +10,13 @@
     "./json-schemas/*": "./src/json-schemas/*.json",
     "./json-types/*": "./src/json-types/*.d.ts"
   },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "src/*"
+      ]
+    }
+  },
   "devDependencies": {
     "json-schema-to-typescript": "^10.1.5"
   }

@@ -6,12 +6,11 @@
   "author": "Mark Kahn <m-github@vouchr.com>",
   "type": "module",
   "dependencies": {
-    "fb-watchman": "^2.0.1",
+    "node-build-tools": "workspace:*",
+    "node-utils": "workspace:*",
     "typescript": "next"
   },
   "devDependencies": {
-    "@types/fb-watchman": "^2.0.1",
-    "@types/voice": "workspace:*",
-    "node-build-tools": "workspace:*"
+    "@types/voice": "workspace:*"
   }
 }

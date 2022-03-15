@@ -10,13 +10,13 @@ class EventEmitter {
         _EventEmitter_listeners.set(this, {});
     }
     static get defaultMaxListeners() {
-        return (0, tslib_1.__classPrivateFieldGet)(this, _a, "f", _EventEmitter_defaultMaxListeners);
+        return tslib_1.__classPrivateFieldGet(this, _a, "f", _EventEmitter_defaultMaxListeners);
     }
     static set defaultMaxListeners(n) {
         if (typeof n !== 'number' || n < 1) {
             throw new RangeError(`defaultMaxListeners must be at least 1.  Tried to set ${n}`);
         }
-        (0, tslib_1.__classPrivateFieldSet)(this, _a, n, "f", _EventEmitter_defaultMaxListeners);
+        tslib_1.__classPrivateFieldSet(this, _a, n, "f", _EventEmitter_defaultMaxListeners);
     }
     addListener(...data) {
         return this.on(...data);
@@ -25,8 +25,8 @@ class EventEmitter {
         await this.emitAndGetData(...args);
     }
     emitAndGetData(eventName, ...data) {
-        const events = (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_instances, "m", _EventEmitter_getListenerArray).call(this, eventName);
-        (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_listeners, "f")[eventName] = events.filter(({ once }) => !once);
+        const events = tslib_1.__classPrivateFieldGet(this, _EventEmitter_instances, "m", _EventEmitter_getListenerArray).call(this, eventName);
+        tslib_1.__classPrivateFieldGet(this, _EventEmitter_listeners, "f")[eventName] = events.filter(({ once }) => !once);
         const mappedResponses = events.map(({ callback, scope }) => new Promise((resolve, reject) => {
             setTimeout(() => {
                 resolve(callback.call(scope, ...data));
@@ -35,34 +35,34 @@ class EventEmitter {
         return Promise.all(mappedResponses);
     }
     getEventNames() {
-        return Object.keys((0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_listeners, "f"));
+        return Object.keys(tslib_1.__classPrivateFieldGet(this, _EventEmitter_listeners, "f"));
     }
     getMaxListeners() {
-        return (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_maxListeners, "f") || (0, tslib_1.__classPrivateFieldGet)(EventEmitter, _a, "f", _EventEmitter_defaultMaxListeners);
+        return tslib_1.__classPrivateFieldGet(this, _EventEmitter_maxListeners, "f") || tslib_1.__classPrivateFieldGet(EventEmitter, _a, "f", _EventEmitter_defaultMaxListeners);
     }
     getListenerCount(eventName) {
-        return (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_instances, "m", _EventEmitter_getListenerArray).call(this, eventName).length;
+        return tslib_1.__classPrivateFieldGet(this, _EventEmitter_instances, "m", _EventEmitter_getListenerArray).call(this, eventName).length;
     }
     getListeners(eventName) {
-        return (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_instances, "m", _EventEmitter_getListenerArray).call(this, eventName).map((listener) => listener.callback);
+        return tslib_1.__classPrivateFieldGet(this, _EventEmitter_instances, "m", _EventEmitter_getListenerArray).call(this, eventName).map((listener) => listener.callback);
     }
     off(eventName, callback) {
-        const events = (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_instances, "m", _EventEmitter_getListenerArray).call(this, eventName);
-        (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_listeners, "f")[eventName] = events.filter(({ callback: eventCallback }) => callback !== eventCallback);
+        const events = tslib_1.__classPrivateFieldGet(this, _EventEmitter_instances, "m", _EventEmitter_getListenerArray).call(this, eventName);
+        tslib_1.__classPrivateFieldGet(this, _EventEmitter_listeners, "f")[eventName] = events.filter(({ callback: eventCallback }) => callback !== eventCallback);
         return this;
     }
     on(eventName, callback, scope) {
-        return (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_instances, "m", _EventEmitter_push).call(this, eventName, { callback, scope });
+        return tslib_1.__classPrivateFieldGet(this, _EventEmitter_instances, "m", _EventEmitter_push).call(this, eventName, { callback, scope });
     }
     once(eventName, callback, scope) {
-        return (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_instances, "m", _EventEmitter_push).call(this, eventName, { once: true, callback, scope });
+        return tslib_1.__classPrivateFieldGet(this, _EventEmitter_instances, "m", _EventEmitter_push).call(this, eventName, { once: true, callback, scope });
     }
     removeAllListeners(eventName) {
         if (eventName) {
-            (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_listeners, "f")[eventName] = [];
+            tslib_1.__classPrivateFieldGet(this, _EventEmitter_listeners, "f")[eventName] = [];
         }
         else {
-            (0, tslib_1.__classPrivateFieldSet)(this, _EventEmitter_listeners, {}, "f");
+            tslib_1.__classPrivateFieldSet(this, _EventEmitter_listeners, {}, "f");
         }
         return this;
     }
@@ -70,16 +70,16 @@ class EventEmitter {
         return this.off(...args);
     }
     setMaxListeners(n) {
-        (0, tslib_1.__classPrivateFieldSet)(this, _EventEmitter_maxListeners, n, "f");
+        tslib_1.__classPrivateFieldSet(this, _EventEmitter_maxListeners, n, "f");
         return this;
     }
 }
 _a = EventEmitter, _EventEmitter_maxListeners = new WeakMap(), _EventEmitter_listeners = new WeakMap(), _EventEmitter_instances = new WeakSet(), _EventEmitter_getListenerArray = function _EventEmitter_getListenerArray(eventName) {
-    return (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_listeners, "f")[eventName] || ((0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_listeners, "f")[eventName] = []);
+    return tslib_1.__classPrivateFieldGet(this, _EventEmitter_listeners, "f")[eventName] || (tslib_1.__classPrivateFieldGet(this, _EventEmitter_listeners, "f")[eventName] = []);
 }, _EventEmitter_push = function _EventEmitter_push(eventName, listener) {
-    const events = (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_instances, "m", _EventEmitter_getListenerArray).call(this, eventName);
+    const events = tslib_1.__classPrivateFieldGet(this, _EventEmitter_instances, "m", _EventEmitter_getListenerArray).call(this, eventName);
     events.push(listener);
-    (0, tslib_1.__classPrivateFieldGet)(this, _EventEmitter_instances, "m", _EventEmitter_validateMaxListeners).call(this, eventName);
+    tslib_1.__classPrivateFieldGet(this, _EventEmitter_instances, "m", _EventEmitter_validateMaxListeners).call(this, eventName);
     return this;
 }, _EventEmitter_validateMaxListeners = function _EventEmitter_validateMaxListeners(eventName) {
     // const maxListeners = this.getMaxListeners();

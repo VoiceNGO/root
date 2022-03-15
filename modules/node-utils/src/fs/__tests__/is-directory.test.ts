@@ -1,4 +1,3 @@
-import expect from 'expect';
 import { resolve } from 'path';
 import isDirectory from '../is-directory';
 

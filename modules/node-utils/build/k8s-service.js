@@ -7,7 +7,7 @@ function K8sServiceToPortNumber(service) {
         case 'HTTP':
             return 80;
         case 'HTTPS':
-            return 442;
+            return 443;
         case 'POSTGRESSQL':
             return 5432;
         case 'REDIS':

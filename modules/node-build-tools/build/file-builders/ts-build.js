@@ -2,26 +2,22 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBuildFiles = exports.buildFile = void 0;
 const tslib_1 = require("tslib");
-const is_service_definition_1 = (0, tslib_1.__importDefault)(require("../build-utils/is-service-definition"));
-const serviceBuilder = (0, tslib_1.__importStar)(require("./ts-service-build.js"));
-const tsBuilder = (0, tslib_1.__importStar)(require("./ts-normal-build.js"));
-var TSTypes;
-(function (TSTypes) {
-    TSTypes[TSTypes["NORMAL"] = 0] = "NORMAL";
-    TSTypes[TSTypes["SERVICE_DEFINITION"] = 1] = "SERVICE_DEFINITION";
-})(TSTypes || (TSTypes = {}));
+const is_service_definition_1 = tslib_1.__importDefault(require("../build-utils/is-service-definition"));
+const serviceBuilder = tslib_1.__importStar(require("./ts-service-build.js"));
+const tsBuilder = tslib_1.__importStar(require("./ts-normal-build.js"));
+const ts_types_1 = tslib_1.__importDefault(require("../enums/ts-types"));
 async function getTSType(srcPath) {
     const isService = await (0, is_service_definition_1.default)(srcPath);
     if (isService) {
-        return TSTypes.SERVICE_DEFINITION;
+        return ts_types_1.default.SERVICE_DEFINITION;
     }
-    return TSTypes.NORMAL;
+    return ts_types_1.default.NORMAL;
 }
 async function getBuilder(srcPath) {
     const tsType = await getTSType(srcPath);
     return {
-        [TSTypes.NORMAL]: tsBuilder,
-        [TSTypes.SERVICE_DEFINITION]: serviceBuilder,
+        [ts_types_1.default.NORMAL]: tsBuilder,
+        [ts_types_1.default.SERVICE_DEFINITION]: serviceBuilder,
     }[tsType];
 }
 async function buildFile(srcPath) {

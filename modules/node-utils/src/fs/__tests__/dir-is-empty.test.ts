@@ -1,11 +1,10 @@
 import { unlink } from 'fs/promises';
-import expect from 'expect';
 import { mkdirp } from '..';
 import dirIsEmpty from '../dir-is-empty';
 import { resolve } from 'path';
 
-const emptyDir = resolve('__dir-is-empty-test__');
-const nonEmptyDir = __dirname;
+const nonEmptyDir = __dirname as absolutePath;
+const emptyDir = resolve(__dirname, '__dir-is-empty-test__');
 
 afterAll(async () => {
   try {

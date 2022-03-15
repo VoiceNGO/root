@@ -1,4 +1,6 @@
+import { join } from 'path';
 import { readFile } from 'fs/promises';
+
 import isObject from 'js-utils/is-object';
 
 import type { JSONSchemaForNPMPackageJsonFiles } from 'schemas/json-types/package';
@@ -7,25 +9,33 @@ import type { SchemaForPrettierrc } from 'schemas/json-types/prettierrc';
 import type { JSONSchemaForTheTypeScriptCompilerSConfigurationFile } from 'schemas/json-types/tsconfig';
 
 export default async function readJsonFile(
-  srcPath: absoluteFilePath,
-  type: 'package.json'
+  srcFolder: absoluteDirPath,
+  fileName: 'package.json'
 ): Promise<JSONSchemaForNPMPackageJsonFiles>;
 export default async function readJsonFile(
-  srcPath: absoluteFilePath,
-  type: 'eslintrc.json'
+  srcFolder: absoluteDirPath,
+  fileName: 'eslintrc.json'
 ): Promise<JSONSchemaForESLintConfigurationFiles>;
 export default async function readJsonFile(
-  srcPath: absoluteFilePath,
-  type: 'prettierrc.json'
+  srcFolder: absoluteDirPath,
+  fileName: 'prettierrc.json'
 ): Promise<SchemaForPrettierrc>;
 export default async function readJsonFile(
-  srcPath: absoluteFilePath,
-  type: 'tsconfig.json'
+  srcFolder: absoluteDirPath,
+  fileName: 'tsconfig.json'
 ): Promise<JSONSchemaForTheTypeScriptCompilerSConfigurationFile>;
 export default async function readJsonFile(
-  srcPath: absoluteFilePath
+  srcFolder: absoluteDirPath,
+  fileName:
+    | fileName
+    | 'package.json'
+    | 'eslintrc.json'
+    | 'prettierrc.json'
+    | 'tsconfig.json'
 ): Promise<jsonObject> {
+  const srcPath = join(srcFolder, fileName);
   const fileContents = await readFile(srcPath);
+
   try {
     const json = JSON.parse(fileContents.toString());
 

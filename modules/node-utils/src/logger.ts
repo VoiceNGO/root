@@ -75,7 +75,7 @@ function getLogger() {
   });
 }
 
-// const logger = IS_TEST_RUNNING ? getTestLogger() : getLogger();
+const logger = IS_TEST_RUNNING ? getTestLogger() : getLogger();
 
 function fork(
   namespace: string,

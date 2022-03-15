@@ -2,7 +2,7 @@ import assert from 'assert';
 import { mkdir } from 'fs/promises';
 import { isAbsolute } from 'path';
 
-import { exists } from './index.js';
+import exists from './exists';
 
 export default async function createDirectoryIfNotExists(
   dirPath: absolutePath

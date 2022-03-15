@@ -1,2 +1,4 @@
 /// <reference types="node" />
-export default function getConsole(): typeof console;
+/// <reference types="node" />
+export default function getConsole(consoleRef?: Console | null): Omit<typeof console, 'Console'>;
+//# sourceMappingURL=console.d.ts.map

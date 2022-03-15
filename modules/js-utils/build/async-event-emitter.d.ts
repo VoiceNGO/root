@@ -21,3 +21,4 @@ declare class EventEmitter {
     setMaxListeners(n: number): EventEmitter;
 }
 export default EventEmitter;
+//# sourceMappingURL=async-event-emitter.d.ts.map

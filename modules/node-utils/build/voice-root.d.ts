@@ -1,4 +1,4 @@
 /// <reference types="voice" />
-export declare function voiceRoot(dir?: absolutePath): string;
-declare const _default: string;
-export default _default;
+declare const voiceRoot: absoluteDirPath;
+export default voiceRoot;
+//# sourceMappingURL=voice-root.d.ts.map

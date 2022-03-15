@@ -1,9 +1,9 @@
-import expect from 'expect';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import exists from '../exists';
 
-const filePath = __filename;
-const dirPath = __dirname;
+const fileName = __filename as fileName;
+const dirPath = __dirname as absoluteDirPath;
+const filePath = join(dirPath, fileName);
 const invalidFilePath = resolve('does.not.exist');
 
 test('file that exists', async () => {

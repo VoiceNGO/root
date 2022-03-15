@@ -1,10 +1,9 @@
-import expect from 'expect';
 import {
   replaceLastOccurrence,
   startsWithUpperCase,
   toCamelCase,
   toPascalCase,
-  toDashedCase,
+  toKebabCase,
 } from '../string';
 
 test('replaces the last occurrence of a string, and only the last occurrence', () => {
@@ -18,20 +17,16 @@ test('startsWithUpperCase', () => {
   expect(startsWithUpperCase('Foo')).toBe(true);
 });
 
+const inputCases = ['foo-bar-baz', 'fooBarBaz', 'FooBarBaz'];
+
 test('toCamelCase', () => {
-  expect(toCamelCase('foo-bar-baz')).toBe('fooBarBaz');
-  expect(toCamelCase('fooBarBaz')).toBe('fooBarBaz');
-  expect(toCamelCase('FooBarBaz')).toBe('fooBarBaz');
+  inputCases.forEach((input) => expect(toCamelCase(input)).toBe('fooBarBaz'));
 });
 
 test('toPascalCase', () => {
-  expect(toPascalCase('foo-bar-baz')).toBe('FooBarBaz');
-  expect(toPascalCase('fooBarBaz')).toBe('FooBarBaz');
-  expect(toPascalCase('FooBarBaz')).toBe('FooBarBaz');
+  inputCases.forEach((input) => expect(toPascalCase(input)).toBe('FooBarBaz'));
 });
 
-test('toDashedCase', () => {
-  expect(toDashedCase('foo-bar-baz')).toBe('foo-bar-baz');
-  expect(toDashedCase('fooBarBaz')).toBe('foo-bar-baz');
-  expect(toDashedCase('FooBarBaz')).toBe('foo-bar-baz');
+test('toKebabCase', () => {
+  inputCases.forEach((input) => expect(toKebabCase(input)).toBe('foo-bar-baz'));
 });

@@ -1,11 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fork = void 0;
-const path_1 = __importDefault(require("path"));
-const winston_1 = __importDefault(require("winston"));
+const tslib_1 = require("tslib");
+const path_1 = tslib_1.__importDefault(require("path"));
+const winston_1 = tslib_1.__importDefault(require("winston"));
 require("winston-syslog");
 // import readJsonFile from './fs/read-json-file';
 const { createLogger, format: { colorize: colorizeFormat, combine: combineFormats, json: jsonFormat, simple: simpleFormat, timestamp: timestampFormat, }, transports: { File: FileTransport, Console: ConsoleTransport, 
@@ -54,7 +52,7 @@ function getLogger() {
         rejectionHandlers: [rejectionsTransport],
     });
 }
-// const logger = IS_TEST_RUNNING ? getTestLogger() : getLogger();
+const logger = IS_TEST_RUNNING ? getTestLogger() : getLogger();
 function fork(namespace, options) {
     const { defaultMeta, ...restOptions } = options || {};
     return logger.child({

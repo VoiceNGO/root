@@ -3,10 +3,11 @@
 import { resolve } from 'path';
 
 import { Command } from 'commander';
-import glob from 'globby';
-import { version } from '../package.json';
+import { globby as glob } from 'globby';
+import readJsonFile from 'node-utils/fs/read-json-file';
 
 async function main() {
+  const { version } = await readJsonFile(resolve('..'), 'package.json');
   const program = new Command();
   program.version(version);
 

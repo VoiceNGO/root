@@ -1,11 +1,11 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+const path_1 = require("path");
 const promises_1 = require("fs/promises");
-const is_object_1 = __importDefault(require("js-utils/is-object"));
-async function readJsonFile(srcPath) {
+const is_object_1 = tslib_1.__importDefault(require("js-utils/is-object"));
+async function readJsonFile(srcFolder, fileName) {
+    const srcPath = (0, path_1.join)(srcFolder, fileName);
     const fileContents = await (0, promises_1.readFile)(srcPath);
     try {
         const json = JSON.parse(fileContents.toString());

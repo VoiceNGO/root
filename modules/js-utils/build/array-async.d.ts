@@ -7,3 +7,4 @@ export declare function filter<T>(ary: Array<T>, cb: (value: T, index: number, a
 export declare function filterIgnoreErrors<T>(ary: Array<T>, cb: (value: T, index: number, array: ReadonlyArray<T>) => Promise<unknown>, thisArg?: unknown): Promise<Array<T>>;
 export declare function forEach<T>(ary: Array<T>, cb: (value: T, index: number, array: ReadonlyArray<T>) => unknown, thisArg?: unknown): Promise<Err | null>;
 export declare function forEachIgnoreErrors<T>(ary: Array<T>, cb: (value: T, index: number, array: ReadonlyArray<T>) => unknown, thisArg?: unknown): Promise<void>;
+//# sourceMappingURL=array-async.d.ts.map

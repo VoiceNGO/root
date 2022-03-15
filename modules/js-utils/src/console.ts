@@ -1,12 +1,13 @@
-export default function getConsole(): typeof console {
-  if (typeof console !== 'undefined') {
-    return console;
+export default function getConsole(
+  consoleRef: Console | null = console
+): Omit<typeof console, 'Console'> {
+  if (consoleRef != null) {
+    return consoleRef;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const voidFn = (): void => {};
 
-  // @ts-expect-error types want Console.Console ... ... ... wtf???
   return {
     log: voidFn,
     assert: voidFn,

@@ -1,9 +1,9 @@
-import { resolve } from 'path';
-import expect from 'expect';
+import { join, resolve } from 'path';
 import isSymbolicLink from '../is-symbolic-link';
 
-const filePath = __filename;
-const dirPath = __dirname;
+const fileName = __filename as fileName;
+const dirPath = __dirname as absoluteDirPath;
+const filePath = join(dirPath, fileName);
 const linkPath = resolve(__dirname, './is-symbolic-link.link');
 
 test('File', async () => {

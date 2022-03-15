@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('typescript/lib/tsc.js');
+require('ttypescript/lib/tsc.js');

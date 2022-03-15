@@ -1,10 +1,11 @@
 export default function getTwoDotExtension(srcFile: fileNameOrPath): string {
-  const splitSrc = srcFile.split('.');
+  const slashSplit = srcFile.split('/');
+  const dotSplit = slashSplit.slice(-1)[0]!.split('.');
 
-  if (splitSrc.length < 2) return '';
+  if (dotSplit.length < 2) return '';
 
-  const lastTwo = splitSrc.slice(-2).join('.').toLowerCase();
-  const lastOne = splitSrc.at(-1)!.toLowerCase();
+  const lastTwo = dotSplit.slice(-2).join('.').toLowerCase();
+  const lastOne = dotSplit.at(-1)!.toLowerCase();
 
   switch (lastTwo) {
     // all valid double-dot extensions

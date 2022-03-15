@@ -39,3 +39,4 @@ Everything in this folder is just a symlink to the same file in the parent folde
     RequestTTY force
     RemoteCommand cd /voice && zsh
     ```
+1.  Copy your local `.gitconfig` to `~/.gitconfig` in the VM. I tried adding this to the Vagrantfile but it wasn't working so I abandoned it. Feel free to fix :)

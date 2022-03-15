@@ -1,8 +1,7 @@
 import { exec } from 'node-utils/child_process/promises';
 import path from 'path';
+import { JSONSchemaForTheTypeScriptCompilerSConfigurationFile } from 'schemas/json-types/tsconfig';
 import { CompilerOptions } from 'typescript';
-import { dirname } from 'node-utils/dirname';
-import type { JSONSchemaForTheTypeScriptCompilerSConfigurationFile } from '@types/voice/src/json-types/tsconfig';
 
 export default async function getTSConfig(
   srcFile: absoluteFilePath

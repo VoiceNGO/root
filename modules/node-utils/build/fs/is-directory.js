@@ -1,9 +1,7 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const assert_1 = __importDefault(require("assert"));
+const tslib_1 = require("tslib");
+const assert_1 = tslib_1.__importDefault(require("assert"));
 const promises_1 = require("fs/promises");
 const path_1 = require("path");
 const gen_await_1 = require("js-utils/gen-await");

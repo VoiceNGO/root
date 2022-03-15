@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toDashedCase = exports.toPascalCase = exports.toCamelCase = exports.startsWithUpperCase = exports.replaceIfAtStart = exports.replaceLastOccurrence = void 0;
+exports.toKebabCase = exports.toPascalCase = exports.toCamelCase = exports.startsWithUpperCase = exports.replaceIfAtStart = exports.replaceLastOccurrence = void 0;
 function replaceLastOccurrence(src, match, replace) {
     const lastIndex = src.lastIndexOf(match);
     if (lastIndex < 0) {
@@ -34,9 +34,9 @@ function toPascalCase(src) {
         .replace(/^([a-z])/, (m0, m1) => m1.toUpperCase());
 }
 exports.toPascalCase = toPascalCase;
-function toDashedCase(src) {
+function toKebabCase(src) {
     return src
         .replace(/^([A-Z])/, (m0, m1) => m1.toLowerCase())
         .replace(/([A-Z])/g, (m0, m1) => `-${m1.toLowerCase()}`);
 }
-exports.toDashedCase = toDashedCase;
+exports.toKebabCase = toKebabCase;

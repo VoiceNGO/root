@@ -2,7 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class Err extends Error {
     constructor(msg, previousError, logLevel) {
-        super(msg?.message || msg);
+        super(
+        // @ts-expect-error -- telling TS that msg.message is an optional string is just annoying
+        {}.hasOwnProperty.call(msg, 'message') ? msg.message : msg);
         Error.captureStackTrace(this, this.constructor);
         this.name = this.constructor.name;
         if (previousError instanceof Error) {

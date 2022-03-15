@@ -11,7 +11,7 @@
   "typesVersions": {
     "*": {
       "*": [
-        "build/*"
+        "src/*"
       ]
     }
   },
@@ -27,9 +27,16 @@
   "devDependencies": {
     "@types/voice": "workspace:*",
     "enhanced-resolve": "^5.8.3",
+    "ts-jest": "^27.1.3",
     "typescript": "next"
   },
   "dependencies": {
-    "jest": "^27.4.4"
+    "@zoltu/typescript-transformer-append-js-extension": "^1.0.1",
+    "chokidar": "^3.5.3",
+    "jest": "^27.4.4",
+    "js-utils": "workspace:*",
+    "schemas": "workspace:*",
+    "ttypescript": "^1.5.13",
+    "typescript-transform-paths": "^3.3.1"
   }
 }

@@ -1,20 +1,21 @@
 module.exports = {
+  preset: 'ts-jest',
   clearMocks: true,
   collectCoverage: false,
   coverageDirectory: 'coverage',
   coverageProvider: 'v8',
+  globals: {
+    'ts-jest': {
+      isolatedModules: true,
+    },
+  },
   // moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
   //   prefix: '<rootDir>/',
   // }),
   // projects: ['<rootDir>/modules/*'],
   // rootDir: '/voice',
-  // resolver: 'node-build-tools/build/jest-module-resolver.cjs',
+  // resolver:
+  //   '/voice/modules/node-build-tools/build/build-utils/jest-resolver.cjs',
   testPathIgnorePatterns: ['/node_modules/', 'test.d.ts'],
-  /*
-  TODO: tests are currently running against test in build instead of src because jest is *slooowwwww* compiling TS and
-        I can't figure out how to make it faster.  Running tests directly against the TS would be better
-  */
-  testRegex: [
-    '/build(?=/)(?!.*/src/).*(/__tests__/(?!_).*|(\\.|/)(test|spec))\\.[jt]sx?$',
-  ],
+  testRegex: ['src/__tests__/.*$'],
 };

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.genAllNull = exports.genAllEnforce = exports.genAll = exports.genNull = exports.genEnforce = exports.gen = void 0;
 const tslib_1 = require("tslib");
-const index_js_1 = (0, tslib_1.__importDefault)(require("./err/index.js"));
+const index_js_1 = tslib_1.__importDefault(require("./err/index.js"));
 async function gen(promise) {
     try {
         return [null, await promise];

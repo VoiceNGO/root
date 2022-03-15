@@ -21,9 +21,9 @@ exports.getBuildFiles = exports.buildFile = void 0;
 const tslib_1 = require("tslib");
 const path_1 = require("path");
 const gen_await_1 = require("js-utils/gen-await");
-const typescript_1 = (0, tslib_1.__importStar)(require("typescript"));
-const get_ts_config_js_1 = (0, tslib_1.__importDefault)(require("../build-utils/get-ts-config.js"));
-const src_to_build_path_js_1 = (0, tslib_1.__importDefault)(require("../build-utils/src-to-build-path.js"));
+const typescript_1 = tslib_1.__importStar(require("typescript"));
+const get_ts_config_js_1 = tslib_1.__importDefault(require("../build-utils/get-ts-config.js"));
+const src_to_build_path_js_1 = tslib_1.__importDefault(require("../build-utils/src-to-build-path.js"));
 function mapStringToEnumValue(keyToMap, enumMap) {
     for (const [key, value] of Object.entries(enumMap)) {
         if (key.toLowerCase() === keyToMap.toLowerCase()) {

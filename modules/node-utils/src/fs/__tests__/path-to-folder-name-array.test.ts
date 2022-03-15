@@ -1,4 +1,3 @@
-import expect from 'expect';
 import pathToFolderNameArray from '../path-to-folder-name-array';
 
 test('relative path', () => {

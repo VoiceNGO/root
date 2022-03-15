@@ -1,6 +1,5 @@
 import { unlink } from 'fs/promises';
 import path from 'path';
-import expect from 'expect';
 import mkdirp from '../mkdirp';
 import exists from '../exists';
 

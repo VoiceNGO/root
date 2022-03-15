@@ -11,12 +11,12 @@
     "./fn": "./build/fn/index.js",
     "./fn/*": "./build/fn/*",
     "./fs": "./build/fs/index.js",
-    "./fs/*": "./build/fs/*"
+    "./fs/*": "./build/fs/*.js"
   },
   "typesVersions": {
     "*": {
       "*": [
-        "build/*"
+        "src/*"
       ]
     }
   },

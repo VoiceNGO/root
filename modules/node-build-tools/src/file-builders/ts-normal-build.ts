@@ -19,13 +19,11 @@ also see: https://github.com/swc-project/swc/issues/657 for a possible pending s
 import { parse, resolve } from 'path';
 
 import { genAllEnforce } from 'js-utils/gen-await';
-import { pick } from 'js-utils/object';
 import { default as ts, ModuleResolutionKind } from 'typescript';
-
-import type { JSONSchemaForTheTypeScriptCompilerSConfigurationFile } from '@types/voice/src/json-types/tsconfig';
 
 import getTSConfig from '../build-utils/get-ts-config.js';
 import srcToBuildPath from '../build-utils/src-to-build-path.js';
+import { JSONSchemaForTheTypeScriptCompilerSConfigurationFile } from 'schemas/json-types/tsconfig';
 
 function mapStringToEnumValue<T extends Obj>(
   keyToMap: string,
@@ -46,7 +44,7 @@ function remapCompilerOptions(
   const remapEnums = { moduleResolution: ModuleResolutionKind };
   Object.entries(remapEnums).forEach(([key, value]) => {
     if (options.hasOwnProperty(key)) {
-      options[key] = mapStringToEnumValue(options[key], value);
+      options[key] = mapStringToEnumValue(options[key] as string, value);
     }
   });
 }

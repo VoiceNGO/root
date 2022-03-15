@@ -1,7 +1,8 @@
 import assert from 'assert';
 import path, { isAbsolute } from 'path';
 
-import { createDirectoryIfNotExists, pathToFolderNameArray } from './index.js';
+import createDirectoryIfNotExists from './create-directory-if-not-exists';
+import pathToFolderNameArray from './path-to-folder-name-array';
 
 export default async function mkdirp(dirPath: absolutePath): Promise<void> {
   assert(isAbsolute(dirPath), 'non-absolute path passed to mkdirp');

@@ -1,6 +1,5 @@
 import Err from '../err/index.js';
 
-import expect from 'expect';
 import {
   gen,
   genNull,

@@ -13,7 +13,7 @@
   "typesVersions": {
     "*": {
       "*": [
-        "build/*"
+        "src/*"
       ]
     }
   },

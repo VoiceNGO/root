@@ -1,12 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function getConsole() {
-    if (typeof console !== 'undefined') {
-        return console;
+function getConsole(consoleRef = console) {
+    if (consoleRef != null) {
+        return consoleRef;
     }
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const voidFn = () => { };
-    // @ts-expect-error types want Console.Console ... ... ... wtf???
     return {
         log: voidFn,
         assert: voidFn,

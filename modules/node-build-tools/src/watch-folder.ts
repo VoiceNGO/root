@@ -1,21 +1,21 @@
-import watchman from 'fb-watchman';
-import voiceRootFolder from 'node-utils/voice-root';
+import chokidar from 'chokidar';
+import voiceRoot from 'node-utils/voice-root';
+import processSubscriptionFile from './process-subscription-file';
 
-const client = new watchman.Client();
+export default function watchFolder(folderToWatch: absoluteDirPath) {
+  chokidar
+    .watch(folderToWatch, {
+      followSymlinks: false,
 
-client.capabilityCheck(
-  { optional: [], required: ['relative_root'] },
-  (err, resp) => {
-    if (err) {
-      return;
-    }
-
-    client.command(['watch-project', voiceRootFolder], (cmdErr, cmdResp) => {
-      if (cmdErr) {
-        return;
+      // ignore node_modules, dot files/folders
+      ignored: /(^|\/)(node_modules|\.)/,
+    })
+    .on('all', (event, path) => {
+      if (path.indexOf(voiceRoot) !== 0) {
+        throw new Error('file not in voice root or relative path detected');
       }
+      processSubscriptionFile(event, path as absolutePath);
     });
-  }
-);
+}
 
-console.log(42);
+watchFolder(voiceRoot);

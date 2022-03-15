@@ -1,3 +1,5 @@
+.vagrant
+
 # Log files
 yarn-debug.log*
 yarn-error.log*

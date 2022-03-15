@@ -1,0 +1,1 @@
+{"version":3,"file":"function-queue.d.ts","sourceRoot":"","sources":["../src/function-queue.ts"],"names":[],"mappings":"AAGA,MAAM,CAAC,OAAO,OAAO,aAAa;IAGpB,OAAO,CAAC,UAAU;IAF9B,OAAO,CAAC,KAAK,CAA8B;IAC3C,OAAO,CAAC,cAAc,CAAK;gBACP,UAAU,SAAI;IAElC,GAAG,CAAC,EAAE,EAAE,MAAM,GAAG,GAAG,IAAI;IAKxB,OAAO,IAAI,IAAI;CAkBhB"}

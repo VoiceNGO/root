@@ -9,7 +9,6 @@ VM_USER = 'vagrant'
 # # VM Port — uncomment this to use NAT instead of DHCP
 # VM_PORT = 8080
 Vagrant.configure(2) do |config|
-
   # allow vm to access github keys
   config.ssh.forward_agent = true
 
@@ -32,6 +31,7 @@ Vagrant.configure(2) do |config|
   config.vm.network :forwarded_port, guest: 443, host: 443
 
   config.vm.synced_folder '.', '/voice'
+  # config.vm.synced_folder "~", "/home/vagrant/", type: "rsync", rsync__args: ["-r", "--include=.gitconfig", "--exclude=*"]
 
   #Install package for your VM
   config.vm.provision "shell", inline: <<-SHELL
@@ -65,18 +65,6 @@ Vagrant.configure(2) do |config|
 
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io \
       nodejs yarn zsh unzip
-
-    # install watchman
-    curl -OJL curl https://github.com/facebook/watchman/releases/download/v2021.10.18.00/watchman-v2021.10.18.00-linux.zip -o watchman.zip
-    unzip watchman.zip
-    cd watchman-v2021.10.18.00-linux
-    sudo mkdir -p /usr/local/{bin,lib} /usr/local/var/run/watchman
-    sudo cp bin/* /usr/local/bin
-    sudo cp lib/* /usr/local/lib
-    sudo chmod 755 /usr/local/bin/watchman
-    sudo chmod 2777 /usr/local/var/run/watchman
-    cd ..
-    rm -rf watchman*
 
     # install microk8s
     sudo snap install microk8s --classic
