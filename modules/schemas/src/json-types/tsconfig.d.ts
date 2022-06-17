@@ -5,14 +5,20 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export type JSONSchemaForTheTypeScriptCompilerSConfigurationFile = CompilerOptionsDefinition &
-  CompileOnSaveDefinition &
-  TypeAcquisitionDefinition &
-  ExtendsDefinition &
-  WatchOptionsDefinition &
-  BuildOptionsDefinition &
-  TsNodeDefinition &
-  (FilesDefinition | ExcludeDefinition | IncludeDefinition | ReferencesDefinition);
+export type JSONSchemaForTheTypeScriptCompilerSConfigurationFile =
+  CompilerOptionsDefinition &
+    CompileOnSaveDefinition &
+    TypeAcquisitionDefinition &
+    ExtendsDefinition &
+    WatchOptionsDefinition &
+    BuildOptionsDefinition &
+    TsNodeDefinition &
+    (
+      | FilesDefinition
+      | ExcludeDefinition
+      | IncludeDefinition
+      | ReferencesDefinition
+    );
 
 export interface CompilerOptionsDefinition {
   /**
@@ -34,7 +40,7 @@ export interface CompilerOptionsDefinition {
     /**
      * Specify the output directory for generated declaration files.
      */
-    declarationDir?: string | null;
+    declarationDir?: string;
     /**
      * Output compiler performance information after building.
      */
@@ -78,7 +84,7 @@ export interface CompilerOptionsDefinition {
     /**
      * Specify what JSX code is generated.
      */
-    jsx?: "preserve" | "react" | "react-jsx" | "react-jsxdev" | "react-native";
+    jsx?: 'preserve' | 'react' | 'react-jsx' | 'react-jsxdev' | 'react-native';
     /**
      * Specify the object invoked for `createElement`. This only applies when targeting `react` JSX emit.
      */
@@ -108,18 +114,18 @@ export interface CompilerOptionsDefinition {
      */
     module?: (
       | (
-          | "CommonJS"
-          | "AMD"
-          | "System"
-          | "UMD"
-          | "ES6"
-          | "ES2015"
-          | "ES2020"
-          | "ESNext"
-          | "None"
-          | "es2022"
-          | "node12"
-          | "nodenext"
+          | 'CommonJS'
+          | 'AMD'
+          | 'System'
+          | 'UMD'
+          | 'ES6'
+          | 'ES2015'
+          | 'ES2020'
+          | 'ESNext'
+          | 'None'
+          | 'ES2022'
+          | 'Node12'
+          | 'NodeNext'
         )
       | {
           [k: string]: unknown;
@@ -130,7 +136,7 @@ export interface CompilerOptionsDefinition {
      * Specify how TypeScript looks up a file from a given module specifier.
      */
     moduleResolution?: (
-      | ("Classic" | "Node")
+      | ('Classic' | 'Node' | 'Node12' | 'NodeNext')
       | {
           [k: string]: unknown;
         }
@@ -140,7 +146,7 @@ export interface CompilerOptionsDefinition {
      * Set the newline character for emitting files.
      */
     newLine?: (
-      | ("crlf" | "lf")
+      | ('crlf' | 'lf')
       | {
           [k: string]: unknown;
         }
@@ -258,7 +264,20 @@ export interface CompilerOptionsDefinition {
      * Set the JavaScript language version for emitted JavaScript and include compatible library declarations.
      */
     target?: (
-      | ("ES3" | "ES5" | "ES6" | "ES2015" | "ES2016" | "ES2017" | "ES2018" | "ES2019" | "ES2020" | "ES2021" | "ESNext")
+      | (
+          | 'ES3'
+          | 'ES5'
+          | 'ES6'
+          | 'ES2015'
+          | 'ES2016'
+          | 'ES2017'
+          | 'ES2018'
+          | 'ES2019'
+          | 'ES2020'
+          | 'ES2021'
+          | 'ES2022'
+          | 'ESNext'
+        )
       | {
           [k: string]: unknown;
         }
@@ -276,27 +295,31 @@ export interface CompilerOptionsDefinition {
      * Specify the polling strategy to use when the system runs out of or doesn't support native file watchers. Requires TypeScript version 3.8 or later.
      */
     fallbackPolling?:
-      | "fixedPollingInterval"
-      | "priorityPollingInterval"
-      | "dynamicPriorityPolling"
-      | "fixedInterval"
-      | "priorityInterval"
-      | "dynamicPriority"
-      | "fixedChunkSize";
+      | 'fixedPollingInterval'
+      | 'priorityPollingInterval'
+      | 'dynamicPriorityPolling'
+      | 'fixedInterval'
+      | 'priorityInterval'
+      | 'dynamicPriority'
+      | 'fixedChunkSize';
     /**
      * Specify the strategy for watching directories under systems that lack recursive file-watching functionality. Requires TypeScript version 3.8 or later.
      */
-    watchDirectory?: "useFsEvents" | "fixedPollingInterval" | "dynamicPriorityPolling" | "fixedChunkSizePolling";
+    watchDirectory?:
+      | 'useFsEvents'
+      | 'fixedPollingInterval'
+      | 'dynamicPriorityPolling'
+      | 'fixedChunkSizePolling';
     /**
      * Specify the strategy for watching individual files. Requires TypeScript version 3.8 or later.
      */
     watchFile?:
-      | "fixedPollingInterval"
-      | "priorityPollingInterval"
-      | "dynamicPriorityPolling"
-      | "useFsEvents"
-      | "useFsEventsOnParentDirectory"
-      | "fixedChunkSizePolling";
+      | 'fixedPollingInterval'
+      | 'priorityPollingInterval'
+      | 'dynamicPriorityPolling'
+      | 'useFsEvents'
+      | 'useFsEventsOnParentDirectory'
+      | 'fixedChunkSizePolling';
     /**
      * Enable experimental support for TC39 stage 2 draft decorators.
      */
@@ -402,65 +425,65 @@ export interface CompilerOptionsDefinition {
      */
     lib?: ((
       | (
-          | "ES5"
-          | "ES6"
-          | "ES2015"
-          | "ES2015.Collection"
-          | "ES2015.Core"
-          | "ES2015.Generator"
-          | "ES2015.Iterable"
-          | "ES2015.Promise"
-          | "ES2015.Proxy"
-          | "ES2015.Reflect"
-          | "ES2015.Symbol.WellKnown"
-          | "ES2015.Symbol"
-          | "ES2016"
-          | "ES2016.Array.Include"
-          | "ES2017"
-          | "ES2017.Intl"
-          | "ES2017.Object"
-          | "ES2017.SharedMemory"
-          | "ES2017.String"
-          | "ES2017.TypedArrays"
-          | "ES2018"
-          | "ES2018.AsyncGenerator"
-          | "ES2018.AsyncIterable"
-          | "ES2018.Intl"
-          | "ES2018.Promise"
-          | "ES2018.Regexp"
-          | "ES2019"
-          | "ES2019.Array"
-          | "ES2019.Object"
-          | "ES2019.String"
-          | "ES2019.Symbol"
-          | "ES2020"
-          | "ES2020.BigInt"
-          | "ES2020.Promise"
-          | "ES2020.String"
-          | "ES2020.Symbol.WellKnown"
-          | "ESNext"
-          | "ESNext.Array"
-          | "ESNext.AsyncIterable"
-          | "ESNext.BigInt"
-          | "ESNext.Intl"
-          | "ESNext.Promise"
-          | "ESNext.String"
-          | "ESNext.Symbol"
-          | "DOM"
-          | "DOM.Iterable"
-          | "ScriptHost"
-          | "WebWorker"
-          | "WebWorker.ImportScripts"
-          | "Webworker.Iterable"
-          | "ES7"
-          | "ES2021"
-          | "ES2020.SharedMemory"
-          | "ES2020.Intl"
-          | "ES2021.Promise"
-          | "ES2021.String"
-          | "ES2021.WeakRef"
-          | "ESNext.WeakRef"
-          | "es2021.intl"
+          | 'ES5'
+          | 'ES6'
+          | 'ES2015'
+          | 'ES2015.Collection'
+          | 'ES2015.Core'
+          | 'ES2015.Generator'
+          | 'ES2015.Iterable'
+          | 'ES2015.Promise'
+          | 'ES2015.Proxy'
+          | 'ES2015.Reflect'
+          | 'ES2015.Symbol.WellKnown'
+          | 'ES2015.Symbol'
+          | 'ES2016'
+          | 'ES2016.Array.Include'
+          | 'ES2017'
+          | 'ES2017.Intl'
+          | 'ES2017.Object'
+          | 'ES2017.SharedMemory'
+          | 'ES2017.String'
+          | 'ES2017.TypedArrays'
+          | 'ES2018'
+          | 'ES2018.AsyncGenerator'
+          | 'ES2018.AsyncIterable'
+          | 'ES2018.Intl'
+          | 'ES2018.Promise'
+          | 'ES2018.Regexp'
+          | 'ES2019'
+          | 'ES2019.Array'
+          | 'ES2019.Object'
+          | 'ES2019.String'
+          | 'ES2019.Symbol'
+          | 'ES2020'
+          | 'ES2020.BigInt'
+          | 'ES2020.Promise'
+          | 'ES2020.String'
+          | 'ES2020.Symbol.WellKnown'
+          | 'ESNext'
+          | 'ESNext.Array'
+          | 'ESNext.AsyncIterable'
+          | 'ESNext.BigInt'
+          | 'ESNext.Intl'
+          | 'ESNext.Promise'
+          | 'ESNext.String'
+          | 'ESNext.Symbol'
+          | 'DOM'
+          | 'DOM.Iterable'
+          | 'ScriptHost'
+          | 'WebWorker'
+          | 'WebWorker.ImportScripts'
+          | 'Webworker.Iterable'
+          | 'ES7'
+          | 'ES2021'
+          | 'ES2020.SharedMemory'
+          | 'ES2020.Intl'
+          | 'ES2021.Promise'
+          | 'ES2021.String'
+          | 'ES2021.WeakRef'
+          | 'ESNext.WeakRef'
+          | 'es2021.intl'
         )
       | {
           [k: string]: unknown;
@@ -515,7 +538,7 @@ export interface CompilerOptionsDefinition {
     /**
      * Specify emit/checking behavior for imports that are only used for types.
      */
-    importsNotUsedAsValues?: "remove" | "preserve" | "error";
+    importsNotUsedAsValues?: 'remove' | 'preserve' | 'error';
     /**
      * Ensure 'use strict' is always emitted.
      */
@@ -700,7 +723,7 @@ export interface TsNodeDefinition {
    *
    * ts-node offers TypeScript execution and REPL for node.js, with source map support.
    */
-  "ts-node"?: {
+  'ts-node'?: {
     /**
      * Specify a custom TypeScript compiler.
      */
@@ -772,7 +795,12 @@ export interface TsNodeDefinition {
       /**
        * Specify what JSX code is generated.
        */
-      jsx?: "preserve" | "react" | "react-jsx" | "react-jsxdev" | "react-native";
+      jsx?:
+        | 'preserve'
+        | 'react'
+        | 'react-jsx'
+        | 'react-jsxdev'
+        | 'react-native';
       /**
        * Specify the object invoked for `createElement`. This only applies when targeting `react` JSX emit.
        */
@@ -802,18 +830,18 @@ export interface TsNodeDefinition {
        */
       module?: (
         | (
-            | "CommonJS"
-            | "AMD"
-            | "System"
-            | "UMD"
-            | "ES6"
-            | "ES2015"
-            | "ES2020"
-            | "ESNext"
-            | "None"
-            | "es2022"
-            | "node12"
-            | "nodenext"
+            | 'CommonJS'
+            | 'AMD'
+            | 'System'
+            | 'UMD'
+            | 'ES6'
+            | 'ES2015'
+            | 'ES2020'
+            | 'ESNext'
+            | 'None'
+            | 'ES2022'
+            | 'Node12'
+            | 'NodeNext'
           )
         | {
             [k: string]: unknown;
@@ -824,7 +852,7 @@ export interface TsNodeDefinition {
        * Specify how TypeScript looks up a file from a given module specifier.
        */
       moduleResolution?: (
-        | ("Classic" | "Node")
+        | ('Classic' | 'Node' | 'Node12' | 'NodeNext')
         | {
             [k: string]: unknown;
           }
@@ -834,7 +862,7 @@ export interface TsNodeDefinition {
        * Set the newline character for emitting files.
        */
       newLine?: (
-        | ("crlf" | "lf")
+        | ('crlf' | 'lf')
         | {
             [k: string]: unknown;
           }
@@ -953,17 +981,18 @@ export interface TsNodeDefinition {
        */
       target?: (
         | (
-            | "ES3"
-            | "ES5"
-            | "ES6"
-            | "ES2015"
-            | "ES2016"
-            | "ES2017"
-            | "ES2018"
-            | "ES2019"
-            | "ES2020"
-            | "ES2021"
-            | "ESNext"
+            | 'ES3'
+            | 'ES5'
+            | 'ES6'
+            | 'ES2015'
+            | 'ES2016'
+            | 'ES2017'
+            | 'ES2018'
+            | 'ES2019'
+            | 'ES2020'
+            | 'ES2021'
+            | 'ES2022'
+            | 'ESNext'
           )
         | {
             [k: string]: unknown;
@@ -982,27 +1011,31 @@ export interface TsNodeDefinition {
        * Specify the polling strategy to use when the system runs out of or doesn't support native file watchers. Requires TypeScript version 3.8 or later.
        */
       fallbackPolling?:
-        | "fixedPollingInterval"
-        | "priorityPollingInterval"
-        | "dynamicPriorityPolling"
-        | "fixedInterval"
-        | "priorityInterval"
-        | "dynamicPriority"
-        | "fixedChunkSize";
+        | 'fixedPollingInterval'
+        | 'priorityPollingInterval'
+        | 'dynamicPriorityPolling'
+        | 'fixedInterval'
+        | 'priorityInterval'
+        | 'dynamicPriority'
+        | 'fixedChunkSize';
       /**
        * Specify the strategy for watching directories under systems that lack recursive file-watching functionality. Requires TypeScript version 3.8 or later.
        */
-      watchDirectory?: "useFsEvents" | "fixedPollingInterval" | "dynamicPriorityPolling" | "fixedChunkSizePolling";
+      watchDirectory?:
+        | 'useFsEvents'
+        | 'fixedPollingInterval'
+        | 'dynamicPriorityPolling'
+        | 'fixedChunkSizePolling';
       /**
        * Specify the strategy for watching individual files. Requires TypeScript version 3.8 or later.
        */
       watchFile?:
-        | "fixedPollingInterval"
-        | "priorityPollingInterval"
-        | "dynamicPriorityPolling"
-        | "useFsEvents"
-        | "useFsEventsOnParentDirectory"
-        | "fixedChunkSizePolling";
+        | 'fixedPollingInterval'
+        | 'priorityPollingInterval'
+        | 'dynamicPriorityPolling'
+        | 'useFsEvents'
+        | 'useFsEventsOnParentDirectory'
+        | 'fixedChunkSizePolling';
       /**
        * Enable experimental support for TC39 stage 2 draft decorators.
        */
@@ -1108,65 +1141,65 @@ export interface TsNodeDefinition {
        */
       lib?: ((
         | (
-            | "ES5"
-            | "ES6"
-            | "ES2015"
-            | "ES2015.Collection"
-            | "ES2015.Core"
-            | "ES2015.Generator"
-            | "ES2015.Iterable"
-            | "ES2015.Promise"
-            | "ES2015.Proxy"
-            | "ES2015.Reflect"
-            | "ES2015.Symbol.WellKnown"
-            | "ES2015.Symbol"
-            | "ES2016"
-            | "ES2016.Array.Include"
-            | "ES2017"
-            | "ES2017.Intl"
-            | "ES2017.Object"
-            | "ES2017.SharedMemory"
-            | "ES2017.String"
-            | "ES2017.TypedArrays"
-            | "ES2018"
-            | "ES2018.AsyncGenerator"
-            | "ES2018.AsyncIterable"
-            | "ES2018.Intl"
-            | "ES2018.Promise"
-            | "ES2018.Regexp"
-            | "ES2019"
-            | "ES2019.Array"
-            | "ES2019.Object"
-            | "ES2019.String"
-            | "ES2019.Symbol"
-            | "ES2020"
-            | "ES2020.BigInt"
-            | "ES2020.Promise"
-            | "ES2020.String"
-            | "ES2020.Symbol.WellKnown"
-            | "ESNext"
-            | "ESNext.Array"
-            | "ESNext.AsyncIterable"
-            | "ESNext.BigInt"
-            | "ESNext.Intl"
-            | "ESNext.Promise"
-            | "ESNext.String"
-            | "ESNext.Symbol"
-            | "DOM"
-            | "DOM.Iterable"
-            | "ScriptHost"
-            | "WebWorker"
-            | "WebWorker.ImportScripts"
-            | "Webworker.Iterable"
-            | "ES7"
-            | "ES2021"
-            | "ES2020.SharedMemory"
-            | "ES2020.Intl"
-            | "ES2021.Promise"
-            | "ES2021.String"
-            | "ES2021.WeakRef"
-            | "ESNext.WeakRef"
-            | "es2021.intl"
+            | 'ES5'
+            | 'ES6'
+            | 'ES2015'
+            | 'ES2015.Collection'
+            | 'ES2015.Core'
+            | 'ES2015.Generator'
+            | 'ES2015.Iterable'
+            | 'ES2015.Promise'
+            | 'ES2015.Proxy'
+            | 'ES2015.Reflect'
+            | 'ES2015.Symbol.WellKnown'
+            | 'ES2015.Symbol'
+            | 'ES2016'
+            | 'ES2016.Array.Include'
+            | 'ES2017'
+            | 'ES2017.Intl'
+            | 'ES2017.Object'
+            | 'ES2017.SharedMemory'
+            | 'ES2017.String'
+            | 'ES2017.TypedArrays'
+            | 'ES2018'
+            | 'ES2018.AsyncGenerator'
+            | 'ES2018.AsyncIterable'
+            | 'ES2018.Intl'
+            | 'ES2018.Promise'
+            | 'ES2018.Regexp'
+            | 'ES2019'
+            | 'ES2019.Array'
+            | 'ES2019.Object'
+            | 'ES2019.String'
+            | 'ES2019.Symbol'
+            | 'ES2020'
+            | 'ES2020.BigInt'
+            | 'ES2020.Promise'
+            | 'ES2020.String'
+            | 'ES2020.Symbol.WellKnown'
+            | 'ESNext'
+            | 'ESNext.Array'
+            | 'ESNext.AsyncIterable'
+            | 'ESNext.BigInt'
+            | 'ESNext.Intl'
+            | 'ESNext.Promise'
+            | 'ESNext.String'
+            | 'ESNext.Symbol'
+            | 'DOM'
+            | 'DOM.Iterable'
+            | 'ScriptHost'
+            | 'WebWorker'
+            | 'WebWorker.ImportScripts'
+            | 'Webworker.Iterable'
+            | 'ES7'
+            | 'ES2021'
+            | 'ES2020.SharedMemory'
+            | 'ES2020.Intl'
+            | 'ES2021.Promise'
+            | 'ES2021.String'
+            | 'ES2021.WeakRef'
+            | 'ESNext.WeakRef'
+            | 'es2021.intl'
           )
         | {
             [k: string]: unknown;
@@ -1221,7 +1254,7 @@ export interface TsNodeDefinition {
       /**
        * Specify emit/checking behavior for imports that are only used for types.
        */
-      importsNotUsedAsValues?: "remove" | "preserve" | "error";
+      importsNotUsedAsValues?: 'remove' | 'preserve' | 'error';
       /**
        * Ensure 'use strict' is always emitted.
        */
@@ -1312,6 +1345,14 @@ export interface TsNodeDefinition {
      */
     experimentalReplAwait?: boolean;
     /**
+     * Enable experimental features that re-map imports and require calls to support:
+     * `baseUrl`, `paths`, `rootDirs`, `.js` to `.ts` file extension mappings,
+     * `outDir` to `rootDir` mappings for composite projects and monorepos.
+     *
+     * For details, see https://github.com/TypeStrong/ts-node/issues/1514
+     */
+    experimentalResolverFeatures?: boolean;
+    /**
      * Load "files" and "include" from `tsconfig.json` on startup.
      *
      * Default is to override `tsconfig.json` "files" and "include" to only include the entrypoint script.
@@ -1381,6 +1422,14 @@ export interface TsNodeDefinition {
      */
     skipIgnore?: boolean;
     /**
+     * Transpile with swc instead of the TypeScript compiler, and skip typechecking.
+     *
+     * Equivalent to setting both `transpileOnly: true` and `transpiler: 'ts-node/transpilers/swc'`
+     *
+     * For complete instructions: https://typestrong.org/ts-node/docs/transpilers
+     */
+    swc?: boolean;
+    /**
      * Use TypeScript's faster `transpileModule`.
      */
     transpileOnly?: boolean;
@@ -1392,13 +1441,7 @@ export interface TsNodeDefinition {
           string,
           {
             [k: string]: unknown;
-          },
-          ...(
-            | string
-            | {
-                [k: string]: unknown;
-              }
-          )[]
+          }
         ]
       | string;
     /**

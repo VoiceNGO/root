@@ -19,7 +19,11 @@ also see: https://github.com/swc-project/swc/issues/657 for a possible pending s
 import { parse, resolve } from 'path';
 
 import { genAllEnforce } from 'js-utils/gen-await';
-import { default as ts, ModuleResolutionKind } from 'typescript';
+import {
+  CompilerOptions,
+  default as ts,
+  ModuleResolutionKind,
+} from 'typescript';
 
 import getTSConfig from '../build-utils/get-ts-config.js';
 import srcToBuildPath from '../build-utils/src-to-build-path.js';
@@ -57,7 +61,10 @@ export async function buildFile(
     getBuildFiles(srcPath)
   );
 
-  const { compilerOptions } = tsConfig;
+  // there are some minor differences in the public and private tsconfig spec that we don't care about
+  // such as enums vs strings so cast them away
+  const compilerOptions = (tsConfig.compilerOptions ||
+    {}) as any as CompilerOptions;
   const { dir: srcDir } = parse(srcPath);
 
   // some of the options don't accept the strings that are in the tsconfig.json files and need to be re-mapped to enums

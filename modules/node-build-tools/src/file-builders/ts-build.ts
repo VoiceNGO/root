@@ -1,6 +1,6 @@
 import isServiceDefinition from '../build-utils/is-service-definition';
-import * as serviceBuilder from './ts-service-build.js';
-import * as tsBuilder from './ts-normal-build.js';
+import * as serviceBuilder from './ts-service-build';
+import * as tsBuilder from './ts-normal-build';
 
 import TSTypes from '../enums/ts-types';
 

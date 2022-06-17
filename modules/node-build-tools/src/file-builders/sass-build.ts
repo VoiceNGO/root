@@ -4,7 +4,9 @@ import srcToBuildPath from '../build-utils/src-to-build-path';
 
 export async function buildFile(
   srcPath: absoluteFilePath
-): Promise<Record<absoluteFilePath, Buffer>> {}
+): Promise<Record<absoluteFilePath, Buffer>> {
+  return {};
+}
 
 export async function getBuildFiles(
   srcPath: absoluteFilePath

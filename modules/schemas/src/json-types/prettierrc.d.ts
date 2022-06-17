@@ -58,6 +58,7 @@ export interface OptionsDefinition {
     | "babel-flow"
     | "babel-ts"
     | "typescript"
+    | "acorn"
     | "espree"
     | "meriyah"
     | "css"
@@ -81,7 +82,7 @@ export interface OptionsDefinition {
    * Overrides default behavior when plugins are searched relatively to the location of Prettier.
    * Multiple values are accepted.
    */
-  pluginSearchDirs?: string[];
+  pluginSearchDirs?: string[] | false;
   /**
    * Add a plugin. Multiple plugins can be passed as separate `--plugin`s.
    */
@@ -119,6 +120,10 @@ export interface OptionsDefinition {
    * Print semicolons.
    */
   semi?: boolean;
+  /**
+   * Enforce single attribute per line in HTML, Vue and JSX.
+   */
+  singleAttributePerLine?: boolean;
   /**
    * Use single quotes instead of double quotes.
    */
@@ -208,6 +213,7 @@ export interface OverridesDefinition {
         | "babel-flow"
         | "babel-ts"
         | "typescript"
+        | "acorn"
         | "espree"
         | "meriyah"
         | "css"
@@ -231,7 +237,7 @@ export interface OverridesDefinition {
        * Overrides default behavior when plugins are searched relatively to the location of Prettier.
        * Multiple values are accepted.
        */
-      pluginSearchDirs?: string[];
+      pluginSearchDirs?: string[] | false;
       /**
        * Add a plugin. Multiple plugins can be passed as separate `--plugin`s.
        */
@@ -269,6 +275,10 @@ export interface OverridesDefinition {
        * Print semicolons.
        */
       semi?: boolean;
+      /**
+       * Enforce single attribute per line in HTML, Vue and JSX.
+       */
+      singleAttributePerLine?: boolean;
       /**
        * Use single quotes instead of double quotes.
        */

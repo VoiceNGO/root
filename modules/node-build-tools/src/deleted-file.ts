@@ -40,5 +40,7 @@ export default async function deletedFile(srcPath: absoluteFilePath) {
 
   const deletePromises = filesToDelete.map(unlink);
 
-  return Promise.all(deletePromises);
+  await Promise.all(deletePromises);
+
+  filesToDelete.forEach((filePath) => console.log(`deleted ${filePath}`));
 }

@@ -24,6 +24,7 @@
   "exclude": [
     "**/node_modules",
     "**/build",
+    "**/__tests__",
     "src/modules/gif-encoder",
     "src/modules/seams"
   ],

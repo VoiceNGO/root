@@ -30,6 +30,10 @@ export type PackageExportsEntryPath = string | null;
  */
 export type PackageExportsFallback = PackageExportsEntry[];
 /**
+ * URL to a website with details about how to fund the package.
+ */
+export type FundingUrl = string;
+/**
  * Run AFTER the package is published.
  */
 export type ScriptsPublishAfter = string;
@@ -139,14 +143,10 @@ export interface JSONSchemaForNPMPackageJsonFiles2 {
          */
         "."?: PackageExportsEntry | PackageExportsFallback;
         /**
-         * The module path prefix that is resolved when the module specifier starts with "name/", set to "./" to allow external modules to import any subpath.
-         */
-        "./"?: PackageExportsEntry | PackageExportsFallback;
-        /**
-         * The module path that is resolved when the path component of the module specifier matches the property name.
+         * The module path prefix that is resolved when the module specifier starts with "name/", set to "./*" to allow external modules to import any subpath.
          *
          * This interface was referenced by `undefined`'s JSON-Schema definition
-         * via the `patternProperty` "^\./".
+         * via the `patternProperty` "^\./.+".
          */
         [k: string]: PackageExportsEntry | PackageExportsFallback;
       }
@@ -249,6 +249,7 @@ export interface JSONSchemaForNPMPackageJsonFiles2 {
         [k: string]: unknown;
       }
     | string;
+  funding?: FundingUrl | FundingWay | [FundingUrl | FundingWay, ...(FundingUrl | FundingWay)[]];
   /**
    * The 'scripts' member is an object hash of script commands that are run at various times in the lifecycle of your package. The key is the lifecycle event, and the value is the command to run at that point.
    */
@@ -277,7 +278,10 @@ export interface JSONSchemaForNPMPackageJsonFiles2 {
      * Run AFTER the tarball has been generated and moved to its final destination.
      */
     postpack?: string;
-    publish?: ScriptsPublishAfter;
+    /**
+     * Publishes a package to the registry so that it can be installed by name. See https://docs.npmjs.com/cli/v8/commands/npm-publish
+     */
+    publish?: string;
     postpublish?: ScriptsPublishAfter;
     /**
      * Run BEFORE the package is installed.
@@ -457,6 +461,16 @@ export interface PackageExportsEntryObject {
    * via the `patternProperty` "^(?![\.0-9]).".
    */
   [k: string]: PackageExportsEntry | PackageExportsFallback;
+}
+/**
+ * Used to inform about ways to help fund development of the package.
+ */
+export interface FundingWay {
+  url: FundingUrl;
+  /**
+   * The type of funding or the platform through which funding can be provided, e.g. patreon, opencollective, tidelift or github.
+   */
+  type?: string;
 }
 /**
  * Dependencies are specified with a simple hash of package name to version range. The version range is a string which has one or more space-separated descriptors. Dependencies can also be identified with a tarball or git URL.

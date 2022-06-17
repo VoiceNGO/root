@@ -42,7 +42,10 @@ function remapCompilerOptions(options) {
 }
 async function buildFile(srcPath) {
     const [tsConfig, [jsBuildPath, definitionBuildPath]] = await (0, gen_await_1.genAllEnforce)((0, get_ts_config_js_1.default)(srcPath), getBuildFiles(srcPath));
-    const { compilerOptions } = tsConfig;
+    // there are some minor differences in the public and private tsconfig spec that we don't care about
+    // such as enums vs strings so cast them away
+    const compilerOptions = (tsConfig.compilerOptions ||
+        {});
     const { dir: srcDir } = (0, path_1.parse)(srcPath);
     // some of the options don't accept the strings that are in the tsconfig.json files and need to be re-mapped to enums
     remapCompilerOptions(compilerOptions);

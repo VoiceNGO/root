@@ -1,7 +1,6 @@
-import getTwoDotExtension from 'node-utils/fs/get-two-dot-extension';
 import { iBuilder, copy, sass, ts } from './file-builders/index.js';
 import { stat } from 'fs/promises';
-import { genAllEnforce } from 'js-utils/gen-await';
+import { genAllNull } from 'js-utils/gen-await';
 
 async function srcIsNewerThanBuildFiles(
   builder: iBuilder,
@@ -9,13 +8,17 @@ async function srcIsNewerThanBuildFiles(
 ): Promise<boolean> {
   const buildFiles = await builder.getBuildFiles(srcPath);
 
-  const [srcStat, ...buildStats] = await genAllEnforce(
+  const [srcStat, ...buildStats] = await genAllNull(
     stat(srcPath),
     ...buildFiles.map((file) => stat(file))
   );
 
+  if (!srcStat) {
+    throw new Error(`could not stat src file ${srcPath}`);
+  }
+
   const olderBuildFiles = buildStats.filter(
-    (buildStat) => buildStat.mtime < srcStat.mtime
+    (buildStat) => !buildStat || buildStat.mtime < srcStat.mtime
   );
   const olderFileExists = olderBuildFiles.length > 0;
 
@@ -28,8 +31,6 @@ export default async function buildFile(
   const builder = getBuilder(srcPath);
 
   if (!builder) {
-    const extension = getTwoDotExtension(srcPath);
-
     console.warn(`No builder available for for file "${srcPath}"`);
     return;
   }
@@ -38,7 +39,7 @@ export default async function buildFile(
     return;
   }
 
-  builder.buildFile(srcPath);
+  // builder.buildFile(srcPath);
 }
 
 export function getBuilder(srcPath: absoluteFilePath): iBuilder | undefined {

@@ -6,6 +6,5 @@
     "outDir": "build",
     "rootDir": "src"
   },
-  "include": ["src/**/*"],
-  "exclude": ["**/_tests__/**/*", "./build/**/*"]
+  "include": ["src/**/*"]
 }
